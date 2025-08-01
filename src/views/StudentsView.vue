@@ -18,7 +18,9 @@ const table = useTemplateRef('table');
 
 </script>
 
-<template>    
+<template>
+    <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted mb-4">Students</h1>
+
     <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
       <UInput
         :model-value="(table?.tableApi?.getColumn('lastname')?.getFilterValue() as string)"
