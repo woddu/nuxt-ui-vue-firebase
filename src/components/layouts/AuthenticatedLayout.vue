@@ -59,6 +59,7 @@ const isSidebarOpen = ref(false);
   padding: 1rem;
   flex-shrink: 0;
   transition: transform 0.3s ease-in-out;
+  
 }
 
 /* Main content */
@@ -98,10 +99,14 @@ const isSidebarOpen = ref(false);
     height: 100vh; */
     transform: translateX(-100%);
     z-index: 1000; 
+    background-color: rgba(255, 255, 255, 0.021); /* semi-transparent */
+    backdrop-filter: blur(10px); /* blur effect */
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
   }
 
   .sidebar.active {
     transform: translateX(0);
+
   }
 
   .main-content {

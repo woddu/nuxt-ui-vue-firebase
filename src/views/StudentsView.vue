@@ -27,7 +27,7 @@ const table = useTemplateRef('table');
         class="max-w-sm min-w-[12ch]" placeholder="Filter Last Names..."
         @update:model-value="table?.tableApi?.getColumn('lastname')?.setFilterValue($event)" />
 
-      <UModal>
+      <UModal title="Add Student">
         <UButton label="Add Student" />
       </UModal>
     </div>
