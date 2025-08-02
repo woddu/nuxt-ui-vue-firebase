@@ -2,12 +2,34 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui';
 import { ref } from 'vue';
+import { getAuth, signOut } from 'firebase/auth';
+import { useRouter } from 'vue-router';
 
-const navItems = ref<NavigationMenuItem[]>([
-  { label: 'Home', to: '/' , onSelect: () => { isSidebarOpen.value = false; } },
-  { label: 'Students', to: '/students', onSelect: () => { isSidebarOpen.value = false; } },
-  { label: 'Contact', to: '/contact', onSelect: () => { isSidebarOpen.value = false; } },
+const auth = getAuth();
+const router = useRouter();
+
+const handleLogout = async () => {
+  await signOut(auth)
+  .then(() => {
+    console.log('User logged out successfully');
+    router.push('/login');
+  })
+  .catch((error) => {
+    console.error('Error logging out:', error);
+  });
+}
+
+const navItems = ref<NavigationMenuItem[][]>([
+  [
+    { label: 'Home', to: '/' , onSelect: () => { isSidebarOpen.value = false; } },
+    { label: 'Students', to: '/students', onSelect: () => { isSidebarOpen.value = false; } },
+    { label: 'Contact', to: '/contact', onSelect: () => { isSidebarOpen.value = false; } },
+  ],
+  [
+  { label: 'Logout', to: '/login', onSelect: handleLogout }
+]
 ]);
+
 
 const isSidebarOpen = ref(false);
 
@@ -27,7 +49,8 @@ const isSidebarOpen = ref(false);
 
       <div class="sidebar" :class="{ active: isSidebarOpen }">
         <UCard class="h-full">
-          <UNavigationMenu  orientation="vertical" variant="link" :items="navItems" />
+          <UNavigationMenu class="mb-auto" orientation="vertical" variant="link" :items="navItems" />
+            <UButton label="Logout" @click="handleLogout" />
         </UCard>
       </div>
 
@@ -78,7 +101,7 @@ const isSidebarOpen = ref(false);
 }
 
 /* Responsive rules */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
 
   .floating-button {
     position: fixed;
