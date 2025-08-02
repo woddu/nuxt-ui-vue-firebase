@@ -19,15 +19,9 @@ const handleLogout = async () => {
   });
 }
 
-const navItems = ref<NavigationMenuItem[][]>([
-  [
-    { label: 'Home', to: '/' , onSelect: () => { isSidebarOpen.value = false; } },
-    { label: 'Students', to: '/students', onSelect: () => { isSidebarOpen.value = false; } },
-    { label: 'Contact', to: '/contact', onSelect: () => { isSidebarOpen.value = false; } },
-  ],
-  [
-  { label: 'Logout', to: '/login', onSelect: handleLogout }
-]
+const navItems = ref<NavigationMenuItem[]>([
+  { label: 'Home', to: '/' , onSelect: () => { isSidebarOpen.value = false; } },
+  { label: 'Students', to: '/students', onSelect: () => { isSidebarOpen.value = false; } },
 ]);
 
 
@@ -48,10 +42,14 @@ const isSidebarOpen = ref(false);
 
 
       <div class="sidebar" :class="{ active: isSidebarOpen }">
-        <UCard class="h-full">
-          <UNavigationMenu class="mb-auto" orientation="vertical" variant="link" :items="navItems" />
-            <UButton label="Logout" @click="handleLogout" />
-        </UCard>
+        
+        <div class="relative rounded-lg overflow-hidden bg-default ring ring-default  divide-default h-full p-4 sm:p-6">
+          <UNavigationMenu orientation="vertical" variant="link" :items="navItems" />
+          
+          <UButton class="absolute bottom-4 sm:bottom-6" label="Logout" @click="handleLogout" />
+          
+        </div>
+        
       </div>
 
       <div class="main-content">
@@ -122,14 +120,14 @@ const isSidebarOpen = ref(false);
     height: 100vh; */
     transform: translateX(-100%);
     z-index: 1000; 
-    background-color: rgba(255, 255, 255, 0.021); /* semi-transparent */
-    backdrop-filter: blur(10px); /* blur effect */
-    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    background-color: rgba(255, 255, 255, 0.0); /* semi-transparent */
+    backdrop-filter: blur(0); /* blur effect */
+    -webkit-backdrop-filter: blur(0); /* Safari support */
+    
   }
 
   .sidebar.active {
     transform: translateX(0);
-
   }
 
   .main-content {
