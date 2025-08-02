@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui';
 import { useCollection } from 'vuefire';
-import { studentsRef } from '@/firebase'; 
+import { studentsRef } from '@/firebase';
 import { DocumentData } from 'firebase/firestore';
 import { useTemplateRef } from 'vue';
 
@@ -19,19 +19,17 @@ const table = useTemplateRef('table');
 </script>
 
 <template>
+  <AuthenticatedLayout>
     <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted mb-4">Students</h1>
 
     <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
-      <UInput
-        :model-value="(table?.tableApi?.getColumn('lastname')?.getFilterValue() as string)"
-        class="max-w-sm min-w-[12ch]"
-        placeholder="Filter Last Names..."
-        @update:model-value="table?.tableApi?.getColumn('lastname')?.setFilterValue($event)"
-      />
+      <UInput :model-value="(table?.tableApi?.getColumn('lastname')?.getFilterValue() as string)"
+        class="max-w-sm min-w-[12ch]" placeholder="Filter Last Names..."
+        @update:model-value="table?.tableApi?.getColumn('lastname')?.setFilterValue($event)" />
 
-        <UModal>
-            <UButton label="Add Student"/>
-        </UModal>
+      <UModal>
+        <UButton label="Add Student" />
+      </UModal>
     </div>
     <div class="border border-muted relative z-[1] rounded-md ">
       <UTable
@@ -39,7 +37,7 @@ const table = useTemplateRef('table');
         :data="data"
         :columns="tableColumn"
         :loading="pending"
-        :error="error"
-      />
+        :error="error" />
     </div>
+  </AuthenticatedLayout>
 </template>
