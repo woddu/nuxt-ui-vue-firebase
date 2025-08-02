@@ -41,11 +41,17 @@ const getCurrentUser = () => {
   })
 }
 
-// Global navigation guard to check authentication
 router.beforeEach(async (to, from, next) => {
-  
   if (to.matched.some((record: any) => record.meta.requiresAuth) && !await getCurrentUser()) {
     next({ name: "Register" });
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if ((to.name === "Register" || to.name === "Login") && await getCurrentUser()) {
+    next({ name: "Home" });
   } else {
     next();
   }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GuestLayout from '@/components/layouts/GuestLayout.vue';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { reactive } from 'vue';
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import { useRouter } from 'vue-router';
@@ -24,15 +24,28 @@ const validate = (state: any): FormError[] => {
 const toast = useToast()
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
-    await createUserWithEmailAndPassword(auth, state.email, state.password)
+    await signInWithEmailAndPassword(auth, state.email, state.password)
         .then((data) =>{
-            console.log('User registered successfully:', data.user);
+            console.log('User logged in successfully:', data.user);
             console.log(auth.currentUser);
             toast.add({ title: 'Success', description: 'The form has been submitted.', color: 'success' })
             router.push('/');
         })
         .catch((error) => {
-            console.error('Error registering user:', error);
+            console.error('Error logging in user:', error);
+            switch(error.code) {
+                case 'auth/invalid-email':
+                    toast.add({ title: 'Error', description: 'Invalid email format.', color: 'danger' });
+                    break;
+                case 'auth/user-not-found':
+                    toast.add({ title: 'Error', description: 'User not found. Please register first.', color: 'danger' });
+                    break;
+                case 'auth/wrong-password':
+                    toast.add({ title: 'Error', description: 'Incorrect password. Please try again.', color: 'danger' });
+                    break;
+                default:
+                    toast.add({ title: 'Error', description: error.message, color: 'danger' });
+            }
             toast.add({ title: 'Error', description: error.message, color: 'danger' });
         });
 }
