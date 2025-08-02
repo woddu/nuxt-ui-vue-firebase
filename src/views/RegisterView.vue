@@ -1,20 +1,41 @@
 <script setup lang="ts">
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { ref } from 'vue';
+import { reactive } from 'vue';
+import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import { useRouter } from 'vue-router';
 
 const auth = getAuth();
 
-const email = ref('');
-const password = ref('');
+const router = useRouter();
 
-const registerUser = async () => {
-    try {
-        await createUserWithEmailAndPassword(auth, email.value, password.value);
-        // Handle successful registration (e.g., redirect or show a success message)
-    } catch (error) {
-        // Handle registration errors (e.g., show an error message)
-    }
-};
+const state = reactive({
+  email: '',
+  password: ''
+})
+
+const validate = (state: any): FormError[] => {
+  const errors = []
+  if (!state.email) errors.push({ name: 'email', message: 'Required' })
+  if (!state.password) errors.push({ name: 'password', message: 'Required' })
+  return errors
+}
+
+const toast = useToast()
+
+async function onSubmit(event: FormSubmitEvent<typeof state>) {
+    await createUserWithEmailAndPassword(auth, state.email, state.password)
+        .then((data) =>{
+            console.log('User registered successfully:', data.user);
+            console.log(auth.currentUser);
+            toast.add({ title: 'Success', description: 'The form has been submitted.', color: 'success' })
+            router.push('/');
+        })
+        .catch((error) => {
+            console.error('Error registering user:', error);
+            toast.add({ title: 'Error', description: error.message, color: 'danger' });
+        });
+}
+
 </script>
 
 <template>
@@ -24,20 +45,18 @@ const registerUser = async () => {
                 <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted">Register</h1>                
             </template>
             
-            <UForm @submit.prevent="registerUser">
+            <UForm :validate="validate" :state="state"  @submit="onSubmit">
                 <div class="flex flex-col gap-4 justify-center">
                     <UFormField label="Email" class="w-full" size="lg">
-                        <UInput v-model="email" type="email" placeholder="Enter your email" required />
+                        <UInput class="w-full" v-model="state.email" type="email" placeholder="Enter your email" required />
                     </UFormField>
                     <UFormField label="Password" class="w-full" size="lg">
-                        <UInput v-model="password" type="password" placeholder="Enter your password" required />
+                        <UInput class="w-full" v-model="state.password" type="password" placeholder="Enter your password" required />
                     </UFormField>
                 </div>
                 <UButton type="submit" label="Register" class="mt-4" />
             </UForm>
-
         </UCard>
-
     </div>
 </template>
 
@@ -50,6 +69,4 @@ const registerUser = async () => {
   justify-content: center;
   min-height: 100vh;
 }
-
-
 </style>
