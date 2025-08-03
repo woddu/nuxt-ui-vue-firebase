@@ -20,7 +20,7 @@ const handleLogout = async () => {
 }
 
 const navItems = ref<NavigationMenuItem[]>([
-  { label: 'Home', to: '/' , onSelect: () => { isSidebarOpen.value = false; } },
+  { label: 'Dashboard', to: '/' , onSelect: () => { isSidebarOpen.value = false; } },
   { label: 'Students', to: '/students', onSelect: () => { isSidebarOpen.value = false; } },
 ]);
 
