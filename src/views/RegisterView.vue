@@ -53,7 +53,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
             
             <UForm :validate="validate" :state="state"  @submit="onSubmit">
                 <div class="flex flex-col gap-4 justify-center">
-                    <UFormField label="Email" class="w-full" size="lg">
+                    <UFormField label="Email" class="w-full" size="xl">
                         <UInput
                           class="w-full"
                           v-model="state.email"
@@ -61,7 +61,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
                           placeholder="Enter your email"
                           required />
                     </UFormField>
-                    <UFormField label="Password" class="w-full" size="lg">
+                    <UFormField label="Password" class="w-full" size="xl">
                         <UInput
                           class="w-full"
                           v-model="state.password"
