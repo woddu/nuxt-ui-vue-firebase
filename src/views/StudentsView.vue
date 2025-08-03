@@ -2,7 +2,7 @@
 import type { FormError, TableColumn } from '@nuxt/ui';
 import { useCollection } from 'vuefire';
 import { studentsRef } from '@/firebase';
-import { addDoc, deleteDoc, doc, DocumentData } from 'firebase/firestore';
+import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
 import { useTemplateRef, ref, reactive, h, resolveComponent } from 'vue';
 import { Student } from '@/interfaces';
 import { ro } from '@nuxt/ui/runtime/locale/index.js';
@@ -108,7 +108,20 @@ const addStudent = async () =>{
 
 const editStudent = async () => {
   isLoading.value = true;
-  
+  const studentDocRef = doc(studentsRef, student.id);
+  await updateDoc(studentDocRef, student)
+  .then(() => {
+    toast.add({ title: 'Success', description: `Student: ${student.lastname} updated successfully.`, color: 'success' })
+    emptyStudent()
+  })
+  .catch((error) => {
+    console.error("Error updating student: ", error);
+    toast.add({ title: 'Error', description: `Failed to update student: ${error.message}`, color: 'error' })
+  })
+  .finally(() => {
+    isLoading.value = false;
+    showFormModal.value = false;
+  });
 };
 
 const deleteStudent = async () => {
@@ -128,7 +141,6 @@ const deleteStudent = async () => {
     showWarningModal.value = false;
   });
 };
-
 
 function emptyStudent() {
   student.lastname = '';
