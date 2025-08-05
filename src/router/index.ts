@@ -48,19 +48,19 @@ const getCurrentUser = () => {
 }
 
 router.beforeEach(async (to, from, next) => {
-  if (to.matched.some((record: any) => record.meta.requiresAuth) && !await getCurrentUser()) {
-    next({ name: "Register" });
+  document.title = `Vue Firebase - ${String(to.name)}`
+  if (to.matched.some((record: any) => record.meta.requiresAuth)) {
+    if (!await getCurrentUser()) {
+      next({ name: "Login" });
+    }
+    next();
   } else {
+    if (await getCurrentUser()) {
+      next({ name: "Home" });
+    }
     next();
   }
 });
 
-router.beforeEach(async (to, from, next) => {
-  if ((to.name === "Register" || to.name === "Login") && await getCurrentUser()) {
-    next({ name: "Home" });
-  } else {
-    next();
-  }
-});
 
 export default router
