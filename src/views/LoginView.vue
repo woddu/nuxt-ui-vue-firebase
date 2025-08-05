@@ -61,7 +61,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
 </script>
 
 <template>
-    <GuestLayout>
+    <GuestLayout :progress="isLoading">
         <UCard class="max-w-md w-full p-6">
             <template #header>
                 <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted">Login</h1>                
@@ -92,7 +92,6 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
                   label="Login"
                   class="mt-4" />
             </UForm>
-            <UProgress v-if="isLoading" indeterminate />
             <template #footer>
                 <p class="text-center text-sm text-gray-500">
                     Don't have an account? 
