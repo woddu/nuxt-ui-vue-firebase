@@ -5,6 +5,13 @@ import { ref } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 
+defineProps({
+  progress: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const auth = getAuth();
 const router = useRouter();
 
@@ -31,7 +38,8 @@ const isSidebarOpen = ref(false);
 
 <template>
     <div class="layout">
-      
+      <UProgress class="fixed top-0 left-0 right-0 z-50" v-if="progress" />
+
       <!-- floating button with bars icon on top right for mobile -->
       <div class="floating-button">
         <UButton
@@ -77,10 +85,9 @@ const isSidebarOpen = ref(false);
   width: 250px;
   height: 100vh; /* Full viewport height */
   width: 250px;
-  padding: 1rem;
+  padding: .75rem;
   flex-shrink: 0;
   transition: transform 0.3s ease-in-out;
-  
 }
 
 /* Main content */
