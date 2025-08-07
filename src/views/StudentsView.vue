@@ -3,16 +3,13 @@ import type { FormError, TableColumn } from '@nuxt/ui';
 import { useCollection } from 'vuefire';
 import { studentsRef } from '@/firebase';
 import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
-import { useTemplateRef, ref, reactive, h, resolveComponent } from 'vue';
+import { ref, reactive, h, resolveComponent } from 'vue';
 import { Student } from '@/interfaces';
-import { ro } from '@nuxt/ui/runtime/locale/index.js';
 
 const UButton = resolveComponent('UButton');
 const UDropdownMenu = resolveComponent('UDropdownMenu');
 
 const { data, error, pending } = useCollection(studentsRef);
-
-const table = useTemplateRef('table');
 
 const showFormModal = ref(false);
 
@@ -21,6 +18,8 @@ const showWarningModal = ref(false);
 const isEditing = ref(false);
 
 const isLoading = ref(false);
+
+const globalFilter = ref('');
 
 const student = reactive<Student>({
   id: '',
@@ -153,13 +152,11 @@ function emptyStudent() {
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <AuthenticatedLayout :progress="isLoading">
     <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted mb-4">Students</h1>
 
     <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
-      <UInput :model-value="(table?.tableApi?.getColumn('lastname')?.getFilterValue() as string)"
-        class="max-w-sm min-w-[12ch]" placeholder="Filter Last Names..."
-        @update:model-value="table?.tableApi?.getColumn('lastname')?.setFilterValue($event)" />
+      <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter"/>
 
       <UModal v-model:open="showFormModal" :title="isEditing ? 'Edit Student' : 'Add Student'" >
 
@@ -198,7 +195,9 @@ function emptyStudent() {
         :data="data"
         :columns="tableColumn"
         :loading="pending"
-        :error="error" />
+        :error="error" 
+        :global-filter="globalFilter"  
+      />
         <UModal v-model:open="showWarningModal" title="Confirm Deletion">
           <template #body>
             <p>Are you sure you want to delete {{ student.lastname }}?</p>
