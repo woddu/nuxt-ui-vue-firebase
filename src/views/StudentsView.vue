@@ -26,16 +26,26 @@ const student = reactive<Student>({
   lastname: '',
   firstname: '',
   middlename: '',
-  age: 0
+  age: 0,
+  section: ''
 });
 
 const toast = useToast();
 
+function column(key: string): TableColumn<DocumentData> {
+  return {
+    accessorKey: key,
+    header: key.charAt(0).toUpperCase() + key.slice(1),
+    cell: ({ row }) => row.getValue(key) ? row.getValue(key) : 'N/A',
+  }
+} 
+
 const tableColumn: TableColumn<DocumentData>[] = [
-  { accessorKey: 'lastname', header: 'Last Name', cell: ({ row }) => row.getValue('lastname') },
-  { accessorKey: 'firstname', header: 'First Name', cell: ({ row }) => row.getValue('firstname') },
-  { accessorKey: 'middlename', header: 'Middle Name', cell: ({ row }) => row.getValue('middlename') },
-  { accessorKey: 'age', header: 'Age', cell: ({ row }) => row.getValue('age') },
+  column('lastname'),
+  column('firstname'),
+  column('middlename'),
+  column('age'),
+  column('section'),
   {
     id: 'actions',
     enableHiding: false,
@@ -92,6 +102,13 @@ const validate = (state: any): FormError[] => {
 }
 
 const addStudent = async () =>{
+  const errors = validate(student);
+  if (errors.length > 0) {
+    for (const error of errors) {
+      toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
+    }
+  }
+  
   isLoading.value = true;
   await addDoc(studentsRef, student as Student)
   .then(() => {
@@ -106,6 +123,13 @@ const addStudent = async () =>{
 } 
 
 const editStudent = async () => {
+  const errors = validate(student);
+  if (errors.length > 0) {
+    for (const error of errors) {
+      toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
+    }
+  }
+  
   isLoading.value = true;
   const studentDocRef = doc(studentsRef, student.id);
   await updateDoc(studentDocRef, student)
