@@ -4,6 +4,7 @@ interface Student {
     firstname: string;
     middlename?: string;
     age: number;
+    section?: string;
 }
 
 export type { Student };
