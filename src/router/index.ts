@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router"
-import StudentsView from "@/views/StudentsView.vue"
 import type { Router, RouterOptions } from "vue-router"
 import { getAuth } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
@@ -27,7 +26,7 @@ const router: Router = createRouter({
     {
       path: "/students",
       name: "Students",
-      component: StudentsView,
+      component: () => import("@/views/StudentsView.vue"),
       meta: { requiresAuth: true },
     },
   ],
