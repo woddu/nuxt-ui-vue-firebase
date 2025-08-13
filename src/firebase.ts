@@ -25,3 +25,5 @@ export const firebaseAnalytics = getAnalytics(firebaseApp);
 const db = getFirestore(firebaseApp);
 
 export const studentsRef = collection(db, "students");
+
+export const sectionsRef = collection(db, "sections");
