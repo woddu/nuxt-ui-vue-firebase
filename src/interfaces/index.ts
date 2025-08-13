@@ -9,4 +9,10 @@ interface Student {
     grade?: string;
 }
 
-export type { Student };
+interface Section {
+    id: string;
+    name: string;
+    grade: number;
+}
+
+export type { Student, Section };
