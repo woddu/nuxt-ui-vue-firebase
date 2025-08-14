@@ -29,6 +29,12 @@ const router: Router = createRouter({
       component: () => import("@/views/StudentsView.vue"),
       meta: { requiresAuth: true },
     },
+    {
+      path: "/sections",
+      name: "Sections",
+      component: () => import("@/views/SectionsView.vue"),
+      meta: { requiresAuth: true },
+    }
   ],
   history: createWebHistory(),
 } as RouterOptions)
