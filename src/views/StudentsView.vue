@@ -21,13 +21,27 @@ const isLoading = ref(false);
 
 const globalFilter = ref('');
 
+const genderOptions = ref([
+  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
+  { label: 'Other', value: 'other' }
+]);
+
+const sectionOptions = ref([
+  { label: 'Section A', value: 'A' },
+  { label: 'Section B', value: 'B' },
+  { label: 'Section C', value: 'C' },
+  { label: 'N/A', value: 'N/A' }
+]);
+
 const student = reactive<Student>({
   id: '',
   lastname: '',
   firstname: '',
   middlename: '',
   age: 0,
-  section: ''
+  gender: 'other',
+  section: 'N/A'
 });
 
 const toast = useToast();
@@ -46,6 +60,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
   column('middlename'),
   column('age'),
   column('section'),
+  column('gender'),
   {
     id: 'actions',
     enableHiding: false,
@@ -177,31 +192,39 @@ function emptyStudent() {
 
 <template>
   <AuthenticatedLayout :progress="isLoading">
-    <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted mb-4">Students</h1>
+    <PageHeaderTitle title="Students" />
 
     <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
       <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter"/>
 
-      <UModal v-model:open="showFormModal" :title="isEditing ? 'Edit Student' : 'Add Student'" >
+      <UModal v-model:open="showFormModal" :title="isEditing ? 'Edit Student' : 'Add Student'" :description="isEditing ? 'Edit the student details below:' : 'Fill in the student details below:'">
 
         <template #body>
           <UForm class="flex flex-col gap-2 lg:gap-4 xl:gap-8" :validate="validate" :state="student" @submit="isEditing ? editStudent() : addStudent()">
-              <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
-                <UFormField label="Last Name" class="w-full" size="xl">
-                  <UInput class="w-full" v-model="student.lastname" type="text" placeholder="Enter last name" required />
-                </UFormField>
-                <UFormField label="First Name" class="w-full" size="xl">
-                  <UInput class="w-full" v-model="student.firstname" type="text" placeholder="Enter first name" required />
-                </UFormField>
-              </div>
-              <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
-                <UFormField label="Middle Name" class="w-full" size="xl">
-                  <UInput class="w-full" v-model="student.middlename" type="text" placeholder="Enter middle name (optional)" />
-                </UFormField>
-                <UFormField label="Age" class="w-full" size="xl">
-                  <UInput class="w-full" v-model.number="student.age" type="number" placeholder="Enter age"
-                    required min="1"/>
-                </UFormField>
+            <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
+              <UFormField label="Last Name" class="w-full" size="xl">
+                <UInput class="w-full" v-model="student.lastname" type="text" placeholder="Enter last name" required />
+              </UFormField>
+              <UFormField label="First Name" class="w-full" size="xl">
+                <UInput class="w-full" v-model="student.firstname" type="text" placeholder="Enter first name" required />
+              </UFormField>
+            </div>
+            <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
+              <UFormField label="Middle Name" class="w-full" size="xl">
+                <UInput class="w-full" v-model="student.middlename" type="text" placeholder="Enter middle name (optional)" />
+              </UFormField>
+              <UFormField label="Age" class="w-full" size="xl">
+                <UInput class="w-full" v-model.number="student.age" type="number" placeholder="Enter age"
+                  required min="1"/>
+              </UFormField>
+            </div>
+            <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
+              <UFormField label="Gender" class="w-full" size="xl">
+                <USelect class="w-full" v-model="student.gender" :items="genderOptions" />
+              </UFormField>
+              <UFormField label="Section" class="w-full" size="xl">
+                <USelect class="w-full" v-model="student.section" :items="sectionOptions" />
+              </UFormField>
             </div>
             <div class="flex justify-end">
               <UButton :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'" class="mt-6" />
