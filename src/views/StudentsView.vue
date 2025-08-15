@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormError, TableColumn } from '@nuxt/ui';
 import { useCollection } from 'vuefire';
-import { studentsRef } from '@/firebase';
+import { sectionsRef, studentsRef } from '@/firebase';
 import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
 import { ref, reactive, h, resolveComponent } from 'vue';
 import { Student } from '@/interfaces';
@@ -10,6 +10,8 @@ const UButton = resolveComponent('UButton');
 const UDropdownMenu = resolveComponent('UDropdownMenu');
 
 const { data, error, pending } = useCollection(studentsRef);
+
+const sections = useCollection(sectionsRef)
 
 const showFormModal = ref(false);
 
@@ -27,11 +29,11 @@ const genderOptions = ref([
   { label: 'Other', value: 'other' }
 ]);
 
-const sectionOptions = ref([
-  { label: 'Section A', value: 'A' },
-  { label: 'Section B', value: 'B' },
-  { label: 'Section C', value: 'C' },
-  { label: 'N/A', value: 'N/A' }
+const sectionOptions = ref([  
+  sections.data.value.map(section => ({
+    label: section.name,
+    value: section.name
+  }))
 ]);
 
 const student = reactive<Student>({
@@ -108,11 +110,13 @@ const tableColumn: TableColumn<DocumentData>[] = [
   }
 ];
 
-const validate = (state: any): FormError[] => {
+const validate = (state: Student): FormError[] => {
   const errors = [];
   if (!state.lastname) errors.push({ name: 'lastname', message: 'Last Name is required' });
   if (!state.firstname) errors.push({ name: 'firstname', message: 'First Name is required' });
   if (!state.age || state.age <= 0) errors.push({ name: 'age', message: 'Age must be a positive number' });
+  if (!state.gender) errors.push({ name: 'gender', message: 'Gender is required' });
+  if (!state.section) errors.push({ name: 'section', message: 'Section is required' });
   return errors;
 }
 
@@ -129,11 +133,15 @@ const addStudent = async () =>{
   .then(() => {
     showFormModal.value = false;
     toast.add({ title: 'Success', description: `Student: ${student.lastname} added successfully.`, color: 'success' })
+    data.value = [...data.value, student]
     emptyStudent()
   })
   .catch((error) => {
     console.error("Error adding student: ", error);
     toast.add({ title: 'Error', description: `Failed to add student: ${error.message}`, color: 'error' })
+  })
+  .finally(() => {
+    isLoading.value = false;
   });
 } 
 
@@ -150,6 +158,9 @@ const editStudent = async () => {
   await updateDoc(studentDocRef, student)
   .then(() => {
     toast.add({ title: 'Success', description: `Student: ${student.lastname} updated successfully.`, color: 'success' })
+    data.value = data.value.map(item =>
+      item.id === student.id ? { ...item, ...student } : item
+    );
     emptyStudent()
   })
   .catch((error) => {
@@ -157,6 +168,7 @@ const editStudent = async () => {
     toast.add({ title: 'Error', description: `Failed to update student: ${error.message}`, color: 'error' })
   })
   .finally(() => {
+
     isLoading.value = false;
     showFormModal.value = false;
   });
@@ -168,6 +180,7 @@ const deleteStudent = async () => {
   await deleteDoc(studentDocRef)
   .then(() => {
     toast.add({ title: 'Success', description: `Student: ${student.lastname} deleted successfully.`, color: 'success' });
+    data.value = data.value.filter(item => item.id !== student.id);
     emptyStudent();
   })
   .catch((error) => {
@@ -185,6 +198,8 @@ function emptyStudent() {
   student.firstname = '';
   student.middlename = '';
   student.age = 0;
+  student.gender = '';
+  student.section = '';
   isEditing.value = false
 }
 
@@ -227,7 +242,7 @@ function emptyStudent() {
               </UFormField>
             </div>
             <div class="flex justify-end">
-              <UButton :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'" class="mt-6" />
+              <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'" class="mt-6" />
             </div>
           </UForm>
 
@@ -250,8 +265,8 @@ function emptyStudent() {
             <p>Are you sure you want to delete {{ student.lastname }}?</p>
           </template>
           <template #footer>
-            <UButton :disabled="isLoading" label="Cancel" @click="showWarningModal = false" />
-            <UButton :disabled="isLoading" label="Delete" color="error" @click="deleteStudent" />
+            <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel" @click="showWarningModal = false" />
+            <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error" @click="deleteStudent" />
           </template>
         </UModal>
     </div>
