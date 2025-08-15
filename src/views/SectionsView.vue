@@ -84,48 +84,48 @@ const tableColumn: TableColumn<DocumentData>[] = [
     }
 ];
 
-const validate = (state: any): FormError[] => {
+const validate = (state: Section): FormError[] => {
     const errors = [];
-    if (!state.lastname) errors.push({ name: 'lastname', message: 'Last Name is required' });
-    if (!state.firstname) errors.push({ name: 'firstname', message: 'First Name is required' });
-    if (!state.age || state.age <= 0) errors.push({ name: 'age', message: 'Age must be a positive number' });
+    if (!state.name) {
+        errors.push({ name: 'name', message: 'Name is required' });
+        toast.add({ title: 'Validation Error', description: 'Name is required', color: 'error' });
+    }
+    if (state.grade < 0) {
+        errors.push({ name: 'grade', message: 'Grade can\'t be a negative number' });
+        toast.add({ title: 'Validation Error', description: 'Grade can\'t be a negative number', color: 'error' });
+    }
     return errors;
 }
 
 const addSection = async () => {
-    const errors = validate(section);
-    if (errors.length > 0) {
-        for (const error of errors) {
-            toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
-        }
-    }
 
     isLoading.value = true;
     await addDoc(sectionsRef, section as Section)
         .then(() => {
             showFormModal.value = false;
             toast.add({ title: 'Success', description: `Section: ${section.name} added successfully.`, color: 'success' })
+            data.value = [...data.value, section]
             emptySection()
         })
         .catch((error) => {
             console.error("Error adding section: ", error);
             toast.add({ title: 'Error', description: `Failed to add section: ${error.message}`, color: 'error' })
+        })
+        .finally(() => {
+            isLoading.value = false;
         });
 }
 
 const editSection = async () => {
-    const errors = validate(section);
-    if (errors.length > 0) {
-        for (const error of errors) {
-            toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
-        }
-    }
 
     isLoading.value = true;
     const sectionDocRef = doc(sectionsRef, section.id);
     await updateDoc(sectionDocRef, section)
         .then(() => {
             toast.add({ title: 'Success', description: `Section: ${section.name} updated successfully.`, color: 'success' })
+            data.value = data.value.map(item =>
+            item.id === section.id ? { ...item, ...section } : item
+            );
             emptySection()
         })
         .catch((error) => {
@@ -144,6 +144,7 @@ const deleteSection = async () => {
     await deleteDoc(sectionDocRef)
         .then(() => {
             toast.add({ title: 'Success', description: `Section: ${section.name} deleted successfully.`, color: 'success' });
+            data.value = data.value.filter(item => item.id !== section.id);
             emptySection();
         })
         .catch((error) => {
@@ -160,7 +161,6 @@ function emptySection() {
     section.id = '';
     section.name = '';
     section.grade = 0;
-
     isEditing.value = false
 }
 </script>
@@ -172,8 +172,8 @@ function emptySection() {
         <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
             <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" />
 
-            <UModal v-model:open="showFormModal" :title="isEditing ? 'Edit Student' : 'Add Student'"
-                :description="isEditing ? 'Edit the student details below:' : 'Fill in the student details below:'">
+            <UModal v-model:open="showFormModal" :title="isEditing ? 'Edit Section' : 'Add Section'"
+                :description="isEditing ? 'Edit the Section details below:' : 'Fill in the Section details below:'">
 
                 <template #body>
                     <UForm class="flex flex-col gap-2 lg:gap-4 xl:gap-8" :validate="validate" :state="section"
@@ -181,15 +181,15 @@ function emptySection() {
                         <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
                             <UFormField label="Name" class="w-full" size="xl">
                                 <UInput class="w-full" v-model="section.name" type="text"
-                                    placeholder="Enter section name" required />
+                                    placeholder="Enter section name" />
                             </UFormField>
-                            <UFormField label="First Name" class="w-full" size="xl">
+                            <UFormField label="Grade Level" class="w-full" size="xl">
                                 <UInput class="w-full" v-model="section.grade" type="number"
-                                    placeholder="Enter section grade level" required />
+                                    placeholder="Enter section grade level" :default-value="0" required />
                             </UFormField>
                         </div>
                         <div class="flex justify-end">
-                            <UButton :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'"
+                            <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'"
                                 class="mt-6" />
                         </div>
                     </UForm>
@@ -207,8 +207,8 @@ function emptySection() {
                     <p>Are you sure you want to delete {{ section.name }}?</p>
                 </template>
                 <template #footer>
-                    <UButton :disabled="isLoading" label="Cancel" @click="showWarningModal = false" />
-                    <UButton :disabled="isLoading" label="Delete" color="error" @click="deleteSection" />
+                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel" @click="showWarningModal = false" />
+                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error" @click="deleteSection" />
                 </template>
             </UModal>
         </div>
