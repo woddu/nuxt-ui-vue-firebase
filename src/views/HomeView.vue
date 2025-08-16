@@ -17,9 +17,6 @@ onMounted(async () => {
 <template>
     <AuthenticatedLayout>
         <PageHeaderTitle title="Dashboard" />
-
-        <USeparator class="mt-4 mb-8 px-2" color="primary" size="lg" />
-
         <!-- grid of cards for dashboard -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <UCard class="px-4 pt-4 pb-2" variant="soft">
@@ -35,7 +32,19 @@ onMounted(async () => {
                     </h2>
                 </div>            
             </UCard>
+            <UCard class="px-4 pt-4 pb-2 col-span-2" variant="soft">
+                <div v-if="pending">
+                    <USkeleton />
+                </div>
+                <div class="flex justify-between gap-4">
+                    <h2 class="text-xl lg:text-2xl text-highlighted font-bold">
+                        Students
+                    </h2>
+                    <h2 class="text-xl lg:text-2xl text-highlighted font-bold">
+                        {{ count }}
+                    </h2>
+                </div>
+            </UCard>
         </div>            
-        
     </AuthenticatedLayout>
 </template>
