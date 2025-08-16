@@ -3,7 +3,7 @@ import type { FormError, TableColumn } from '@nuxt/ui';
 import { useCollection } from 'vuefire';
 import { sectionsRef, studentsRef } from '@/firebase';
 import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
-import { ref, reactive, h, resolveComponent } from 'vue';
+import { ref, reactive, h, resolveComponent, watch } from 'vue';
 import { Student } from '@/interfaces';
 
 const UButton = resolveComponent('UButton');
@@ -11,7 +11,7 @@ const UDropdownMenu = resolveComponent('UDropdownMenu');
 
 const { data, error, pending } = useCollection(studentsRef);
 
-const sections = useCollection(sectionsRef)
+const { data: sections, pending: sectionsPending } = useCollection(sectionsRef)
 
 const showFormModal = ref(false);
 
@@ -23,18 +23,18 @@ const isLoading = ref(false);
 
 const globalFilter = ref('');
 
-const genderOptions = ref([
+interface SelectOptions {
+  label: string;
+  value: string;
+}
+
+const genderOptions = ref<SelectOptions[]>([
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
   { label: 'Other', value: 'other' }
 ]);
 
-const sectionOptions = ref([  
-  sections.data.value.map(section => ({
-    label: section.name,
-    value: section.name
-  }))
-]);
+const sectionOptions = ref<SelectOptions[]>([]);
 
 const student = reactive<Student>({
   id: '',
@@ -133,14 +133,17 @@ const addStudent = async () =>{
   .then(() => {
     showFormModal.value = false;
     toast.add({ title: 'Success', description: `Student: ${student.lastname} added successfully.`, color: 'success' })
-    data.value = [...data.value, student]
-    emptyStudent()
+    console.log(data.value)
+    data.value = [...data.value]
+    console.log(data.value)
+    
   })
   .catch((error) => {
     console.error("Error adding student: ", error);
     toast.add({ title: 'Error', description: `Failed to add student: ${error.message}`, color: 'error' })
   })
   .finally(() => {
+    emptyStudent()
     isLoading.value = false;
   });
 } 
@@ -158,17 +161,14 @@ const editStudent = async () => {
   await updateDoc(studentDocRef, student)
   .then(() => {
     toast.add({ title: 'Success', description: `Student: ${student.lastname} updated successfully.`, color: 'success' })
-    data.value = data.value.map(item =>
-      item.id === student.id ? { ...item, ...student } : item
-    );
-    emptyStudent()
+    data.value = [...data.value]
   })
   .catch((error) => {
     console.error("Error updating student: ", error);
     toast.add({ title: 'Error', description: `Failed to update student: ${error.message}`, color: 'error' })
   })
   .finally(() => {
-
+    emptyStudent()
     isLoading.value = false;
     showFormModal.value = false;
   });
@@ -180,7 +180,7 @@ const deleteStudent = async () => {
   await deleteDoc(studentDocRef)
   .then(() => {
     toast.add({ title: 'Success', description: `Student: ${student.lastname} deleted successfully.`, color: 'success' });
-    data.value = data.value.filter(item => item.id !== student.id);
+    data.value = [...data.value]
     emptyStudent();
   })
   .catch((error) => {
@@ -194,6 +194,7 @@ const deleteStudent = async () => {
 };
 
 function emptyStudent() {
+  student.id = '';
   student.lastname = '';
   student.firstname = '';
   student.middlename = '';
@@ -202,6 +203,21 @@ function emptyStudent() {
   student.section = '';
   isEditing.value = false
 }
+
+watch(sectionsPending, (newVal) => {
+  if (!newVal) {
+    sectionOptions.value = sections.value.map(section => ({
+      label: section.name,
+      value: section.name
+    }));
+  }
+})
+
+watch(pending, (newVal) => {
+  if (!newVal) {
+    console.log("Pending:", pending.value);
+  }
+});
 
 </script>
 

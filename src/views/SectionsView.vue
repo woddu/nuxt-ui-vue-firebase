@@ -104,7 +104,7 @@ const addSection = async () => {
         .then(() => {
             showFormModal.value = false;
             toast.add({ title: 'Success', description: `Section: ${section.name} added successfully.`, color: 'success' })
-            data.value = [...data.value, section]
+            data.value = [...data.value]
             emptySection()
         })
         .catch((error) => {
@@ -123,9 +123,7 @@ const editSection = async () => {
     await updateDoc(sectionDocRef, section)
         .then(() => {
             toast.add({ title: 'Success', description: `Section: ${section.name} updated successfully.`, color: 'success' })
-            data.value = data.value.map(item =>
-            item.id === section.id ? { ...item, ...section } : item
-            );
+            data.value = [...data.value]
             emptySection()
         })
         .catch((error) => {
@@ -144,7 +142,7 @@ const deleteSection = async () => {
     await deleteDoc(sectionDocRef)
         .then(() => {
             toast.add({ title: 'Success', description: `Section: ${section.name} deleted successfully.`, color: 'success' });
-            data.value = data.value.filter(item => item.id !== section.id);
+            data.value = [...data.value]
             emptySection();
         })
         .catch((error) => {
