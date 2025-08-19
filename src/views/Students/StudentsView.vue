@@ -199,8 +199,8 @@ function emptyStudent() {
   student.firstname = '';
   student.middlename = '';
   student.age = 0;
-  student.gender = '';
-  student.section = '';
+  student.gender = 'other';
+  student.section = 'N/A';
   isEditing.value = false
 }
 
@@ -213,7 +213,7 @@ watch(sectionsPending, (newVal) => {
   }
 })
 
-watch(pending, (newVal) => {
+watch(sections, (newVal) => {
   if (!newVal) {
     console.log("Pending:", pending.value);
   }
