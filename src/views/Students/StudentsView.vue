@@ -80,6 +80,8 @@ const tableColumn: TableColumn<DocumentData>[] = [
           student.firstname = row.original.firstname;
           student.middlename = row.original.middlename;
           student.age = row.original.age;
+          student.gender = row.original.gender;
+          student.section = row.original.section;
           isEditing.value = true;
           showFormModal.value = true;
         }
