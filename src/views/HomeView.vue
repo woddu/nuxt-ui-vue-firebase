@@ -20,7 +20,7 @@ onMounted(async () => {
         <!-- grid of cards for dashboard -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <UCard class="px-4 pt-4 pb-2" variant="soft">
-                <div v-if="pending">
+                <div v-if="pending || count === 0">
                     <USkeleton />
                 </div>
                 <div class="flex justify-between gap-4">
@@ -33,7 +33,7 @@ onMounted(async () => {
                 </div>            
             </UCard>
             <UCard class="px-4 pt-4 pb-2 col-span-2" variant="soft">
-                <div v-if="pending">
+                <div v-if="pending || count === 0">
                     <USkeleton />
                 </div>
                 <div class="flex justify-between gap-4">
