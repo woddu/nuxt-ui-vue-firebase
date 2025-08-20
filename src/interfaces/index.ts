@@ -15,4 +15,9 @@ interface Section {
     grade: number;
 }
 
-export type { Student, Section };
+interface SelectOptions {
+  label: string;
+  value: string;
+}
+
+export type { Student, Section, SelectOptions };
