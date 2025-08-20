@@ -28,6 +28,33 @@ const router: Router = createRouter({
       name: "Students",
       component: () => import("@/views/Students/StudentsView.vue"),
       meta: { requiresAuth: true },
+      redirect: { name: "students-list" },
+      children: [
+        {
+          path: "",
+          name: "students-overview",
+          redirect: { name: "students-list" }
+        },
+        {
+          path: "/students/list",
+          name: "students-list",
+          component: () => import("@/views/Students/Table.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "/students/edit/:id",
+          name: "edit-student",
+          component: () => import("@/views/Students/Edit.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "/students/add",
+          name: "add-student",
+          component: () => import("@/views/Students/Add.vue"),
+          meta: { requiresAuth: true },
+        },
+        
+      ],
     },
     {
       path: "/sections",
@@ -53,7 +80,7 @@ const getCurrentUser = () => {
 }
 
 router.beforeEach(async (to, from, next) => {
-  document.title = `Vue Firebase - ${String(to.name)}`
+  document.title = `Student Management Sys - ${String(to.name)}`
   if (to.matched.some((record: any) => record.meta.requiresAuth)) {
     if (!await getCurrentUser()) {
       next({ name: "Login" });
