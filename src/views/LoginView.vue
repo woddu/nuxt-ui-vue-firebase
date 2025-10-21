@@ -4,12 +4,18 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { reactive, ref } from 'vue';
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
+import { db } from '@/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { Teacher } from '@/interfaces';
 
 const auth = getAuth();
 
 const router = useRouter();
 
 const isLoading = ref(false);
+
+const userStore = useUserStore();
 
 const state = reactive({
   email: '',
@@ -26,43 +32,86 @@ const validate = (state: any): FormError[] => {
 const toast = useToast()
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
-    isLoading.value = true;
-    await signInWithEmailAndPassword(auth, state.email, state.password)
-        .then((data) =>{
-            // console.log('User logged in successfully:', data.user);
-            // console.log(auth.currentUser);
-            toast.add({ title: 'Success', description: 'Logged in successfully.', color: 'success' })
-            router.push('/');
-        })
-        .catch((error) => {
-            console.error('Error logging in user:', error);
-            switch(error.code) {
-                case 'auth/invalid-email':
-                    toast.add({ title: 'Error', description: 'Invalid email format.', color: 'error' });
-                    break;
-                case 'auth/user-not-found':
-                    toast.add({ title: 'Error', description: 'User not found. Please register first.', color: 'error' });
-                    break;
-                case 'auth/wrong-password':
-                    toast.add({ title: 'Error', description: 'Incorrect password. Please try again.', color: 'error' });
-                    break;
-                case 'auth/invalid-credential':
-                    toast.add({ title: 'Error', description: 'Invalid credentials provided.', color: 'error' });
-                    break;
-                default:
-                    toast.add({ title: 'Error', description: error.message, color: 'error' });
-            }
-        })
-        .finally(() => {
-            isLoading.value = false
+  isLoading.value = true;
+
+  try {
+    // 1. Sign in with Firebase Auth
+    const { user } = await signInWithEmailAndPassword(
+      auth,
+      state.email,
+      state.password
+    );
+
+    // 2. Query Firestore for the user document
+    const q = query(collection(db, "users"), where("email", "==", user.email));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      const userDoc = snapshot.docs[0].data();
+      userStore.setUser(userDoc as Teacher); // Save Firestore user data into Pinia
+    } else {
+      console.warn("No matching user document found in Firestore");
+      userStore.setUser(null);
+    }
+
+    // 3. Success feedback
+    toast.add({
+      title: "Success",
+      description: "Logged in successfully.",
+      color: "success",
+    });
+
+    router.push("/");
+  } catch (error: any) {
+    console.error("Error logging in user:", error);
+
+    switch (error.code) {
+      case "auth/invalid-email":
+        toast.add({
+          title: "Error",
+          description: "Invalid email format.",
+          color: "error",
         });
+        break;
+      case "auth/user-not-found":
+        toast.add({
+          title: "Error",
+          description: "User not found. Please register first.",
+          color: "error",
+        });
+        break;
+      case "auth/wrong-password":
+        toast.add({
+          title: "Error",
+          description: "Incorrect password. Please try again.",
+          color: "error",
+        });
+        break;
+      case "auth/invalid-credential":
+        toast.add({
+          title: "Error",
+          description: "Invalid credentials provided.",
+          color: "error",
+        });
+        break;
+      default:
+        toast.add({
+          title: "Error",
+          description: error.message,
+          color: "error",
+        });
+    }
+  } finally {
+    isLoading.value = false;
+  }
 }
+
 
 </script>
 
 <template>
     <GuestLayout :progress="isLoading">
-        <UCard class="max-w-md w-full p-6">
+        <UCard class="max-w-md w-full p-6" variant="subtle">
             <template #header>
                 <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted">Login</h1>                
             </template>
@@ -90,7 +139,8 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
                   :disabled="isLoading"
                   type="submit"
                   label="Login"
-                  class="mt-4" />
+                  class="mt-4" 
+                  size="xl"/>
             </UForm>
             <template #footer>
                 <p class="text-center text-sm text-gray-500">
