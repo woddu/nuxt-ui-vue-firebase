@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui';
-import { useCollection } from 'vuefire';
-import { studentsRef } from '@/firebase';
-import { deleteDoc, doc, DocumentData } from 'firebase/firestore';
-import { ref, h, resolveComponent, watch } from 'vue';
+import { DocumentData } from 'firebase/firestore';
+import { ref, h, resolveComponent, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { reactive } from 'vue';
 import { Student } from '@/interfaces';
+import { useStudents } from '@/composables/useStudents';
+import { deleteStudent } from '@/services/studentService';
+import { useSections } from '@/composables/useSections';
 
 const emit = defineEmits<{
   (e: 'loading', value: boolean): void
@@ -17,7 +18,13 @@ const router = useRouter()
 const UButton = resolveComponent('UButton');
 const UDropdownMenu = resolveComponent('UDropdownMenu');
 
-const { data, error, pending } = useCollection(studentsRef);
+const students = useStudents();
+
+const pending = ref(students.pending.value);
+
+const error = ref(students.error.value);  
+
+const sections = useSections();
 
 const showWarningModal = ref(false);
 
@@ -30,32 +37,38 @@ const globalFilter = ref('');
 function column(key: string, capitalize: boolean = false): TableColumn<DocumentData> {
   return {
     accessorKey: key,
-    header: key.charAt(0).toUpperCase() + key.slice(1),
+    header: key === 'sectionId' ? 'Section' : key.charAt(0).toUpperCase() + key.slice(1),
     cell: ({ row }) => {
-      if (capitalize && row.getValue(key) != undefined) {
-        return row.getValue<String>(key) ? row.getValue<String>(key).charAt(0).toUpperCase() + row.getValue<String>(key).slice(1) : 'N/A';
+      if (key === 'sectionId') {
+        const sectionId = row.getValue<String>('sectionId');
+        const section = sections.data.value.find(sec => sec.id === sectionId);
+        return section ? section.name : 'N/A';
+      } else {
+        if (capitalize && row.getValue(key) != undefined) {
+          return row.getValue<String>(key) ? row.getValue<String>(key).charAt(0).toUpperCase() + row.getValue<String>(key).slice(1) : 'N/A';
+        }
+        return row.getValue<String>(key) ? row.getValue<String>(key) : 'N/A';
       }
-      return row.getValue<String>(key) ? row.getValue<String>(key) : 'N/A';
     }
   }
 }
 
 const student = reactive<Student>({
   id: '',
-  lastname: '',
-  firstname: '',
-  middlename: '',
+  lastName: '',
+  firstName: '',
+  middleName: '',
   age: 0,
   gender: 'other',
-  section: 'N/A'
+  sectionId: 'N/A'
 });
 
 const tableColumn: TableColumn<DocumentData>[] = [
-  column('lastname'),
-  column('firstname'),
-  column('middlename'),
+  column('lastName'),
+  column('firstName'),
+  column('middleName'),
   column('age'),
-  column('section'),
+  column('sectionId'),
   column('gender', true),
   {
     id: 'actions',
@@ -79,7 +92,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
         label: 'Delete Student',
         onSelect: () => {
           student.id = row.original.id;
-          student.lastname = row.original.lastname;
+          student.lastName = row.original.lastName;
           showWarningModal.value = true;
         }
       }]
@@ -106,14 +119,13 @@ const addStudent = () => {
   router.push({ name: 'add-student' });
 }
 
-const deleteStudent = async () => {
+const deleteStudentHandler = async () => {
   isLoading.value = true;
   emit('loading', isLoading.value);
-  const studentDocRef = doc(studentsRef, student.id);
-  await deleteDoc(studentDocRef)
+  deleteStudent(student.id)
     .then(() => {
-      toast.add({ title: 'Success', description: `Student: ${student.lastname} deleted successfully.`, color: 'success' });
-      data.value = [...data.value]
+      toast.add({ title: 'Success', description: `Student: ${student.lastName} deleted successfully.`, color: 'success' });
+      students.data.value = [...students.data.value]
     })
     .catch((error) => {
       console.error("Error deleting student: ", error);
@@ -126,32 +138,37 @@ const deleteStudent = async () => {
     });
 };
 
-watch(pending, (newVal) => {
+onMounted(() => {
+  emit('loading', students.pending.value);
+});
+
+watch(students.pending, (newVal) => {
   emit('loading', newVal);
+  pending.value = newVal;
 });
 
 </script>
 
 <template>
-<PageHeaderTitle title="Students" />
+  <PageHeaderTitle title="Students" />
 
   <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
     <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" />
 
-    <UButton label="Add Student" @click="addStudent()" />
+    <UButton label="Add Student" @click="addStudent()" size="xl"/>
   </div>
   <div class="border border-muted relative z-[1] rounded-md ">
-    <UTable ref="table" :data="data" :columns="tableColumn" :loading="pending" :error="error"
+    <UTable ref="table" :data="students" :columns="tableColumn" :loading="pending" :error="error"
       :global-filter="globalFilter" />
     <UModal v-model:open="showWarningModal" title="Confirm Deletion">
       <template #body>
-        <p>Are you sure you want to delete {{ student.lastname }}?</p>
+        <p>Are you sure you want to delete {{ student.lastName }}?</p>
       </template>
       <template #footer>
         <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel"
           @click="showWarningModal = false" />
         <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error"
-          @click="deleteStudent" />
+          @click="deleteStudentHandler" />
       </template>
     </UModal>
   </div>

@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { sectionsRef } from '@/firebase';
-import { useCollection } from 'vuefire';
-import { ref, reactive, h, resolveComponent } from 'vue';
+import { ref, reactive, h, resolveComponent, watch } from 'vue';
 import { Section } from '@/interfaces';
 import type { FormError, TableColumn } from '@nuxt/ui';
-import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
+import { DocumentData } from 'firebase/firestore';
+import { useSections } from '@/composables/useSections';
+import { addSection, deleteSection, updateSection } from '@/services/sectionService';
 const UButton = resolveComponent('UButton');
 const UDropdownMenu = resolveComponent('UDropdownMenu');
 
-const { data, error, pending } = useCollection(sectionsRef);
+const sections = useSections();
+
+const pending = ref(sections.pending.value);
+
+const error = ref(sections.error.value);
 
 const showFormModal = ref(false);
 
@@ -23,7 +27,8 @@ const globalFilter = ref('');
 const section = reactive<Section>({
     id: '',
     name: '',
-    grade: 0
+    yearLevel: 0,
+    strand: '',    
 });
 
 const toast = useToast();
@@ -38,7 +43,8 @@ function column(key: string): TableColumn<DocumentData> {
 
 const tableColumn: TableColumn<DocumentData>[] = [
     column('name'),
-    column('grade'),
+    column('yearLevel'),
+    column('strand'),
     {
         id: 'actions',
         enableHiding: false,
@@ -53,7 +59,8 @@ const tableColumn: TableColumn<DocumentData>[] = [
                 onSelect: () => {
                     section.id = row.original.id;
                     section.name = row.original.name;
-                    section.grade = row.original.grade;
+                    section.yearLevel = row.original.yearLevel;
+                    section.strand = row.original.strand;
                     isEditing.value = true;
                     showFormModal.value = true;
                 }
@@ -90,21 +97,21 @@ const validate = (state: Section): FormError[] => {
         errors.push({ name: 'name', message: 'Name is required' });
         toast.add({ title: 'Validation Error', description: 'Name is required', color: 'error' });
     }
-    if (state.grade < 0) {
+    if (state.yearLevel < 0) {
         errors.push({ name: 'grade', message: 'Grade can\'t be a negative number' });
         toast.add({ title: 'Validation Error', description: 'Grade can\'t be a negative number', color: 'error' });
     }
     return errors;
 }
 
-const addSection = async () => {
+const addSectionHandler = async () => {
 
     isLoading.value = true;
-    await addDoc(sectionsRef, section as Section)
+    addSection(section)
         .then(() => {
             showFormModal.value = false;
             toast.add({ title: 'Success', description: `Section: ${section.name} added successfully.`, color: 'success' })
-            data.value = [...data.value]
+            sections.data.value = [...sections.data.value]
             emptySection()
         })
         .catch((error) => {
@@ -116,14 +123,13 @@ const addSection = async () => {
         });
 }
 
-const editSection = async () => {
+const editSectionHandler = async () => {
 
     isLoading.value = true;
-    const sectionDocRef = doc(sectionsRef, section.id);
-    await updateDoc(sectionDocRef, section)
+    updateSection(section)
         .then(() => {
             toast.add({ title: 'Success', description: `Section: ${section.name} updated successfully.`, color: 'success' })
-            data.value = [...data.value]
+            sections.data.value = [...sections.data.value]
             emptySection()
         })
         .catch((error) => {
@@ -136,13 +142,12 @@ const editSection = async () => {
         });
 };
 
-const deleteSection = async () => {
+const deleteSectionHandler = async () => {
     isLoading.value = true;
-    const sectionDocRef = doc(sectionsRef, section.id);
-    await deleteDoc(sectionDocRef)
+    deleteSection(section.id)
         .then(() => {
             toast.add({ title: 'Success', description: `Section: ${section.name} deleted successfully.`, color: 'success' });
-            data.value = [...data.value]
+            sections.data.value = [...sections.data.value]
             emptySection();
         })
         .catch((error) => {
@@ -158,9 +163,15 @@ const deleteSection = async () => {
 function emptySection() {
     section.id = '';
     section.name = '';
-    section.grade = 0;
+    section.yearLevel = 0;
+    section.strand = '';    
     isEditing.value = false
 }
+
+watch(sections.pending, (newVal) => {    
+    pending.value = newVal;
+});
+
 </script>
 
 <template>
@@ -175,38 +186,38 @@ function emptySection() {
 
                 <template #body>
                     <UForm class="flex flex-col gap-2 lg:gap-4 xl:gap-8" :validate="validate" :state="section"
-                        @submit="isEditing ? editSection() : addSection()">
+                        @submit="isEditing ? editSectionHandler() : addSectionHandler()">
                         <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
                             <UFormField label="Name" class="w-full" size="xl">
                                 <UInput class="w-full" v-model="section.name" type="text"
                                     placeholder="Enter section name" />
                             </UFormField>
-                            <UFormField label="Grade Level" class="w-full" size="xl">
-                                <UInput class="w-full" v-model="section.grade" type="number"
-                                    placeholder="Enter section grade level" :default-value="0" required />
+                            <UFormField label="Year Level" class="w-full" size="xl">
+                                <UInput class="w-full" v-model="section.yearLevel" type="number"
+                                    placeholder="Enter section year level" :default-value="0" required />
                             </UFormField>
                         </div>
                         <div class="flex justify-end">
                             <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'"
-                                class="mt-6" />
+                                class="mt-6" size="xl"/>
                         </div>
                     </UForm>
 
                 </template>
 
-                <UButton label="Add Section" @click="emptySection" />
+                <UButton label="Add Section" @click="emptySection" size="xl"/>
             </UModal>
         </div>
         <div class="border border-muted relative z-[1] rounded-md ">
-            <UTable ref="table" :data="data" :columns="tableColumn" :loading="pending" :error="error"
+            <UTable ref="table" :data="sections" :columns="tableColumn" :loading="pending" :error="error"
                 :global-filter="globalFilter" />
             <UModal v-model:open="showWarningModal" title="Confirm Deletion">
                 <template #body>
                     <p>Are you sure you want to delete {{ section.name }}?</p>
                 </template>
                 <template #footer>
-                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel" @click="showWarningModal = false" />
-                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error" @click="deleteSection" />
+                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel" @click="showWarningModal = false" size="xl"/>
+                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error" @click="deleteSectionHandler" size="xl"/>
                 </template>
             </UModal>
         </div>

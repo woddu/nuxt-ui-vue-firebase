@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { sectionsRef, studentsRef } from '@/firebase';
-import { Section, SelectOptions, Student } from '@/interfaces';
+import { useSections } from '@/composables/useSections';
+import { useStudentById } from '@/composables/useStudents';
+import { SelectOptions, Student } from '@/interfaces';
+import { updateStudent } from '@/services/studentService';
 import { FormError } from '@nuxt/ui';
-import { doc, updateDoc } from 'firebase/firestore';
 import { reactive, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCollection, useDocument } from 'vuefire';
 
 const emit = defineEmits<{
   (e: 'loading', value: boolean): void
@@ -15,11 +15,10 @@ const router = useRouter();
 
 const toast = useToast()
 
-const studentDocRef = doc(studentsRef, router.currentRoute.value.params.id as string);
 
-const { data: studentDoc, pending: studentPending } = useDocument(studentDocRef)
+const { data: studentDoc, pending: studentPending } = useStudentById(router.currentRoute.value.params.id as string);
 
-const { data: sections, pending: sectionsPending } = useCollection<Section>(sectionsRef)
+const { data: sections, pending: sectionsPending } = useSections();
 
 const genderOptions = ref<SelectOptions[]>([
   { label: 'Male', value: 'male' },
@@ -31,27 +30,27 @@ const sectionOptions = ref<SelectOptions[]>([]);
 
 const student = reactive<Student>({
   id: studentDoc.value?.id || '',
-  lastname: studentDoc.value?.lastname || '',
-  firstname: studentDoc.value?.firstname || '',
-  middlename: studentDoc.value?.middlename || '',
+  lastName: studentDoc.value?.lastName || '',
+  firstName: studentDoc.value?.firstName || '',
+  middleName: studentDoc.value?.middleName || '',
   age: studentDoc.value?.age || 0,
   gender: studentDoc.value?.gender || '',
-  section: studentDoc.value?.section || ''
+  sectionId: studentDoc.value?.sectionId || ''
 });
 
 const isLoading = ref(false);
 
 const validate = (state: Student): FormError[] => {
   const errors = [];
-  if (!state.lastname) errors.push({ name: 'lastname', message: 'Last Name is required' });
-  if (!state.firstname) errors.push({ name: 'firstname', message: 'First Name is required' });
+  if (!state.lastName) errors.push({ name: 'lastName', message: 'Last Name is required' });
+  if (!state.firstName) errors.push({ name: 'firstName', message: 'First Name is required' });
   if (!state.age || state.age <= 0) errors.push({ name: 'age', message: 'Age must be a positive number' });
   if (!state.gender) errors.push({ name: 'gender', message: 'Gender is required' });
-  if (!state.section) errors.push({ name: 'section', message: 'Section is required' });
+  if (!state.sectionId) errors.push({ name: 'sectionId', message: 'Section is required' });
   return errors;
 }
 
-const editStudent = async () => {
+const editStudentHandler = async () => {
   const errors = validate(student);
   if (errors.length > 0) {
     for (const error of errors) {
@@ -61,12 +60,12 @@ const editStudent = async () => {
 
   isLoading.value = true;
   emit('loading', isLoading.value);
-  await updateDoc(studentDocRef, student)
+  updateStudent(student)
     .then(() => {
-      toast.add({ title: 'Success', description: `Student: ${student.lastname} updated successfully.`, color: 'success' })
+      toast.add({ title: 'Success', description: `Student: ${student.lastName} updated successfully.`, color: 'success' })
       isLoading.value = false;
       emit('loading', isLoading.value);
-      router.push({ name: 'students' });
+      router.push({ name: 'Students' });
     })
     .catch((error) => {
       console.error("Error updating student: ", error);
@@ -79,10 +78,9 @@ const editStudent = async () => {
 };
 
 watch(sections, () => {
-  
   sectionOptions.value = sections.value.map(section => ({
     label: section.name,
-    value: section.name
+    value: section.id
   }));
   emit('loading', sectionsPending.value);
 });
@@ -90,34 +88,34 @@ watch(sections, () => {
 watch(studentDoc, (newVal) => {
   if (!newVal) return;
   student.id = newVal.id;
-  student.lastname = newVal.lastname;
-  student.firstname = newVal.firstname;
-  student.middlename = newVal.middlename;
+  student.lastName = newVal.lastName;
+  student.firstName = newVal.firstName;
+  student.middleName = newVal.middleName;
   student.age = newVal.age;
   student.gender = newVal.gender;
-  student.section = newVal.section;
+  student.sectionId = newVal.sectionId;
   emit('loading', studentPending.value);
 });
 
 </script>
 
 <template>
-  <PageHeaderTitle :title="'Edit Student: ' + student.lastname + ', ' + student.firstname" />
+  <PageHeaderTitle :title="'Edit Student: ' + student.lastName + ', ' + student.firstName" />
 
-  <UForm class="flex flex-col gap-2 lg:gap-4 xl:gap-8" :validate="validate" :state="student" @submit="editStudent()">
+  <UForm class="flex flex-col gap-2 lg:gap-4 xl:gap-8" :validate="validate" :state="student" @submit="editStudentHandler()">
     <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
       <UFormField label="Last Name" class="w-full" size="xl">
-        <UInput class="w-full" v-model="student.lastname" type="text" placeholder="Enter last name" required
+        <UInput class="w-full" v-model="student.lastName" type="text" placeholder="Enter last name" required
           :disabled="studentPending" />
       </UFormField>
       <UFormField label="First Name" class="w-full" size="xl">
-        <UInput class="w-full" v-model="student.firstname" type="text" placeholder="Enter first name" required
+        <UInput class="w-full" v-model="student.firstName" type="text" placeholder="Enter first name" required
           :disabled="studentPending" />
       </UFormField>
     </div>
     <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
       <UFormField label="Middle Name" class="w-full" size="xl">
-        <UInput class="w-full" v-model="student.middlename" type="text" placeholder="Enter middle name (optional)"
+        <UInput class="w-full" v-model="student.middleName" type="text" placeholder="Enter middle name (optional)"
           :disabled="studentPending" />
       </UFormField>
       <UFormField label="Age" class="w-full" size="xl">
@@ -130,7 +128,7 @@ watch(studentDoc, (newVal) => {
         <USelect class="w-full" v-model="student.gender" :items="genderOptions" :disabled="studentPending" />
       </UFormField>
       <UFormField label="Section" class="w-full" size="xl">
-        <USelect class="w-full" v-model="student.section" :items="sectionOptions" :disabled="studentPending" />
+        <USelect class="w-full" v-model="student.sectionId" :items="sectionOptions" :disabled="studentPending" />
       </UFormField>
     </div>
     <div class="flex justify-start">

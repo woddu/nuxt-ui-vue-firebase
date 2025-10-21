@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/components/layouts/AuthenticatedLayout.vue';
-import useStudentsCount from '@/composables/useStudentsCount';
+import { getStudentCount } from '@/composables/useStudents';
 import { onMounted, ref } from 'vue';
 
 
@@ -8,9 +8,17 @@ const pending = ref(true);
 const count = ref(0);
 
 onMounted(async () => {
-    const { pending: newPending, count: newCount } = await useStudentsCount();
-    pending.value = newPending.value;
-    count.value = newCount.value;
+    try {
+    // all students
+    count.value = await getStudentCount()
+
+    // or for a specific section
+    // count.value = await getStudentCount('sec001')
+  } catch (err: any) {
+    // error.value = err.message ?? 'Failed to fetch count'
+  } finally {
+    pending.value = false
+  }
 });
 </script>
 
