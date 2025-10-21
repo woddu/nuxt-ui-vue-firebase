@@ -7,7 +7,6 @@ const isLoading = ref(true);
 
 <template>
   <AuthenticatedLayout :progress="isLoading">
-
     <RouterView @loading="(value: boolean) => isLoading = value" />
   </AuthenticatedLayout>
 </template>

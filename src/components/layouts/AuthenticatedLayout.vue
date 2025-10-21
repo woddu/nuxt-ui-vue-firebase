@@ -53,9 +53,19 @@ const isSidebarOpen = ref(false);
       <div class="sidebar" :class="{ active: isSidebarOpen }">
         
         <div class="relative rounded-lg overflow-hidden bg-default ring ring-default  divide-default h-full p-4 sm:p-6">
-          <UNavigationMenu orientation="vertical" variant="link" :items="navItems" />
+          <UNavigationMenu
+            orientation="vertical"            
+            :items="navItems" 
+            :ui="{
+              item: 'mx-1',  
+              link: 'text-md'
+            }"/>
           
-          <UButton class="absolute bottom-4 sm:bottom-6" label="Logout" @click="handleLogout" />
+          <UButton
+            class="absolute bottom-4 sm:bottom-6"
+            label="Logout"
+            size="xl"
+            @click="handleLogout" />
           
         </div>
         

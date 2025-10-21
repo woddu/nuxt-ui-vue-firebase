@@ -74,7 +74,8 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
                   :disabled="isLoading"
                   type="submit"
                   label="Register"
-                  class="mt-4" />
+                  class="mt-4" 
+                  size="xl"/>
             </UForm>
             <template #footer>
                 <p class="text-center text-sm text-gray-500">
