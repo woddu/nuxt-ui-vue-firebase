@@ -4,7 +4,6 @@ import { DocumentData } from 'firebase/firestore';
 import { ref, h, resolveComponent, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { reactive } from 'vue';
-import { Student } from '@/interfaces';
 import { useStudents } from '@/composables/useStudents';
 import { deleteStudent } from '@/services/studentService';
 import { useSections } from '@/composables/useSections';
@@ -53,14 +52,10 @@ function column(key: string, capitalize: boolean = false): TableColumn<DocumentD
   }
 }
 
-const student = reactive<Student>({
+const student = reactive({
   id: '',
   lastName: '',
-  firstName: '',
-  middleName: '',
-  age: 0,
-  gender: 'other',
-  sectionId: 'N/A'
+  firstName: ''
 });
 
 const tableColumn: TableColumn<DocumentData>[] = [
@@ -84,7 +79,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
         onSelect: () => {
           emit('loading', true);
           router.push({
-            name: 'edit-student',
+            name: 'Edit-Student',
             params: { id: row.original.id }
           });
         }
@@ -93,6 +88,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
         onSelect: () => {
           student.id = row.original.id;
           student.lastName = row.original.lastName;
+          student.firstName = row.original.firstName;
           showWarningModal.value = true;
         }
       }]
@@ -116,7 +112,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
 
 const addStudent = () => {
   emit('loading', true);
-  router.push({ name: 'add-student' });
+  router.push({ name: 'Add-Student' });
 }
 
 const deleteStudentHandler = async () => {
@@ -165,9 +161,9 @@ watch(students.pending, (newVal) => {
       </template>
       <template #footer>
         <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel"
-          @click="showWarningModal = false" />
+          @click="showWarningModal = false" size="xl"/>
         <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error"
-          @click="deleteStudentHandler" />
+          @click="deleteStudentHandler" size="xl"/>
       </template>
     </UModal>
   </div>

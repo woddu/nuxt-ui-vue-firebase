@@ -36,24 +36,24 @@ const router: Router = createRouter({
       children: [
         {
           path: "",
-          name: "students-overview",
-          redirect: { name: "students-list" }
+          name: "Students-Overview",
+          redirect: { name: "Students-List" }
         },
         {
           path: "/students/list",
-          name: "students-list",
+          name: "Students-List",
           component: () => import("@/views/Admin/Students/Table.vue"),
           meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: "/students/edit/:id",
-          name: "edit-student",
+          name: "Edit-Student",
           component: () => import("@/views/Admin/Students/Edit.vue"),
           meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: "/students/add",
-          name: "add-student",
+          name: "Add-Student",
           component: () => import("@/views/Admin/Students/Add.vue"),
           meta: { requiresAuth: true, requiresAdmin: true },
         },
@@ -71,6 +71,26 @@ const router: Router = createRouter({
       name: "Advisories",
       component: () => import("@/views/Teacher/AdvisoriesView.vue"),
       meta: { requiresAuth: true, requiresTeacher: true },
+    },
+    {
+      path: "/teachers",
+      name: "Teachers",
+      component: () => import("@/views/Admin/Teachers/TeachersView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
+      redirect: { name: "Teachers-List" },
+      children: [
+        {
+          path: "",
+          name: "Teachers-Overview",
+          redirect: { name: "Teachers-List" }
+        },
+        {
+          path: "/teachers/list",
+          name: "Teachers-List",
+          component: () => import("@/views/Admin/Teachers/Table.vue"),
+          meta: { requiresAuth: true, requiresAdmin: true },
+        },
+      ]
     }
   ],
   history: createWebHistory(),
