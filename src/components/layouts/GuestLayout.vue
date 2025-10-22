@@ -11,7 +11,7 @@ defineProps({
 
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen">
-        <UProgress class="fixed top-0 left-0 right-0 z-50" v-if="progress" />
+        <UProgress class="fixed top-0 left-0 right-0 z-50 h-1!" v-if="progress" />
         <slot/>
     </div>
 </template>
