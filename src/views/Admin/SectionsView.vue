@@ -175,8 +175,7 @@ watch(sections.pending, (newVal) => {
 </script>
 
 <template>
-    <AuthenticatedLayout :progress="pending">
-        <PageHeaderTitle title="Sections" />
+    <AuthenticatedLayout :progress="pending" title="Sections">
 
         <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
             <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" />

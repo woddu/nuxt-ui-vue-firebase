@@ -6,7 +6,7 @@ const isLoading = ref(true);
 </script>
 
 <template>
-  <AuthenticatedLayout :progress="isLoading">
+  <AuthenticatedLayout :progress="isLoading" title="Students">
     <RouterView @loading="(value: boolean) => isLoading = value" />
   </AuthenticatedLayout>
 </template>

@@ -150,7 +150,6 @@ watch(students.pending, (newVal) => {
 </script>
 
 <template>
-  <PageHeaderTitle title="Students" />
 
   <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
     <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" />

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useSections } from '@/composables/useSections';
-import { Section, SelectOptions, Student } from '@/interfaces';
+import { SelectOptions, Student } from '@/interfaces';
 import { addStudent } from '@/services/studentService';
 import { FormError } from '@nuxt/ui';
-import { watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -80,6 +80,10 @@ watch(sections.data, (newVal) => {
 
 watch(sections.pending, (newVal) => {
   emit('loading', newVal);
+});
+
+onMounted(() => {
+  emit('loading', sections.pending.value);
 });
 
 </script>
