@@ -1,7 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router"
 import type { Router, RouterOptions } from "vue-router"
-import { getAuth } from "firebase/auth";
+import { getAuth, User } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
+import { useUserStore } from "@/stores/user";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { Teacher } from "@/interfaces";
 
 const router: Router = createRouter({
   routes: [
@@ -20,14 +24,14 @@ const router: Router = createRouter({
     {
       path: "/",
       name: "Home",
-      component: () => import("@/views/HomeView.vue"),
-      meta: { requiresAuth: true },
+      component: () => import("@/views/Admin/HomeView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
       path: "/students",
       name: "Students",
-      component: () => import("@/views/Students/StudentsView.vue"),
-      meta: { requiresAuth: true },
+      component: () => import("@/views/Admin/Students/StudentsView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
       redirect: { name: "students-list" },
       children: [
         {
@@ -38,20 +42,20 @@ const router: Router = createRouter({
         {
           path: "/students/list",
           name: "students-list",
-          component: () => import("@/views/Students/Table.vue"),
-          meta: { requiresAuth: true },
+          component: () => import("@/views/Admin/Students/Table.vue"),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: "/students/edit/:id",
           name: "edit-student",
-          component: () => import("@/views/Students/Edit.vue"),
-          meta: { requiresAuth: true },
+          component: () => import("@/views/Admin/Students/Edit.vue"),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: "/students/add",
           name: "add-student",
-          component: () => import("@/views/Students/Add.vue"),
-          meta: { requiresAuth: true },
+          component: () => import("@/views/Admin/Students/Add.vue"),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         
       ],
@@ -59,40 +63,78 @@ const router: Router = createRouter({
     {
       path: "/sections",
       name: "Sections",
-      component: () => import("@/views/SectionsView.vue"),
-      meta: { requiresAuth: true },
+      component: () => import("@/views/Admin/SectionsView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: "/advisories",
+      name: "Advisories",
+      component: () => import("@/views/Teacher/AdvisoriesView.vue"),
+      meta: { requiresAuth: true, requiresTeacher: true },
     }
   ],
   history: createWebHistory(),
 } as RouterOptions)
 
-const getCurrentUser = () => {
+const getCurrentUser = (): Promise<User | null> => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
-      getAuth(), 
-      (user: any) => {
-        removeListener()
-        resolve(user)
+      getAuth(),
+      (user) => {
+        removeListener();
+        resolve(user); // user is User | null
       },
       reject
-    )
-  })
-}
+    );
+  });
+};
+
 
 router.beforeEach(async (to, from, next) => {
-  document.title = `Student Management Sys - ${String(to.name)}`
+  document.title = `Student Management Sys - ${String(to.name)}`;
+  const currentUser = await getCurrentUser();
+  const userStore = useUserStore();
+
+  if (userStore.user === null && currentUser) {
+    const q = query(collection(db, "users"), where("email", "==", currentUser.email));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      const userDoc = snapshot.docs[0].data();
+      userStore.setUser(userDoc as Teacher); // Save Firestore user data into Pinia
+    } else {
+      console.warn("No matching user document found in Firestore");
+      userStore.setUser(null);
+    }
+  }
+
   if (to.matched.some((record: any) => record.meta.requiresAuth)) {
-    if (!await getCurrentUser()) {
-      next({ name: "Login" });
+    if (!currentUser) {
+      return next({ name: "Login" });
     }
-    next();
+
+    // 🔑 check admin requirement
+    if (to.matched.some((record: any) => record.meta.requiresAdmin)) {
+      if (userStore.user?.role !== "admin") {
+        // redirect non-admins to a safe page
+        return next({ name: "Advisories" }); 
+      }
+    } else if (to.matched.some((record: any) => record.meta.requiresTeacher)) {
+      if (userStore.user?.role !== "teacher") {
+        // redirect non-teachers to a safe page
+        return next({ name: "Home" }); 
+      }
+    }
+
+    return next();
   } else {
-    if (await getCurrentUser()) {
-      next({ name: "Home" });
+    if (currentUser) {
+      return next({ name: "Home" });
     }
-    next();
+    return next();
   }
 });
+
 
 
 export default router
