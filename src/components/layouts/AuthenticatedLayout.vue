@@ -1,19 +1,27 @@
 
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 
 defineProps({
   progress: {
     type: Boolean,
     default: false
+  },
+  title: {
+    type: String,
+    default: 'Dashboard'
   }
 })
 
 const auth = getAuth();
+
 const router = useRouter();
+
+const userStore = useUserStore();
 
 const handleLogout = async () => {
   await signOut(auth)
@@ -26,133 +34,84 @@ const handleLogout = async () => {
   });
 }
 
-const navItems = ref<NavigationMenuItem[]>([
-  { label: 'Dashboard', to: '/' , onSelect: () => { isSidebarOpen.value = false; } },
-  { label: 'Students', to: '/students', onSelect: () => { isSidebarOpen.value = false; } },
-  { label: 'Sections', to: '/sections', onSelect: () => { isSidebarOpen.value = false; } },
+interface AppNavigationMenuItem extends Omit<NavigationMenuItem, 'children'> {
+  role?: string;
+  children?: AppNavigationMenuItem[];
+}
+
+const navItems = ref<AppNavigationMenuItem[]>([
+  { label: 'Dashboard', to: '/', role: 'admin' },
+  { label: 'Students', to: '/students', role: 'admin' },
+  { label: 'Sections', to: '/sections', role: 'admin' },
+  { label: 'Advisories', to: '/advisories', role: 'teacher' },
 ]);
 
+const filteredNavItems = computed<AppNavigationMenuItem[]>(() => {
+  if (!userStore.user) return [];
+  return navItems.value.filter(item => !item.role || item.role === userStore.user?.role);
+});
 
-const isSidebarOpen = ref(false);
 
 </script>
 
 <template>
-    <div class="layout">
-      <UProgress class="fixed top-0 left-0 right-0 z-50" v-if="progress" />
-
-      <!-- floating button with bars icon on top right for mobile -->
-      <div class="floating-button">
-        <UButton
-          class="rounded-full p-2"
-          icon="mdi-menu"
-          @click="isSidebarOpen = !isSidebarOpen" />
-      </div>
-
-
-      <div class="sidebar" :class="{ active: isSidebarOpen }">
+    <UDashboardGroup>
+    <UProgress class="fixed top-0 left-0 right-0 z-50 h-1!" v-if="progress" />
+      <UDashboardSidebar collapsible :ui="{ footer: 'border-t border-default' }">
         
-        <div class="relative rounded-lg overflow-hidden bg-default ring ring-default  divide-default h-full p-4 sm:p-6">
-          <UNavigationMenu
-            orientation="vertical"            
-            :items="navItems" 
-            :ui="{
-              item: 'mx-1',  
-              link: 'text-md'
-            }"/>
-          
+        <template #header>
+          <div class="p-4 font-bold">LMS</div>
+        </template>
+
+        <template #toggle>
+          <UDashboardSidebarToggle variant="subtle" />
+        </template>
+
+        <UNavigationMenu
+          orientation="vertical"            
+          :items="filteredNavItems" 
+          :ui="{
+            item: 'mx-1',  
+            link: 'text-md'
+          }"/>
+        
+        <template #footer>
+
           <UButton
-            class="absolute bottom-4 sm:bottom-6"
+            class="w-full"
             label="Logout"
             size="xl"
-            @click="handleLogout" />
-          
-        </div>
+            @click="handleLogout" 
+            color="neutral"
+            variant="ghost"/>
+        </template>
+            
+      </UDashboardSidebar>
+
+      <UDashboardPanel>
+        <template #header>
+          <UDashboardNavbar>
+            <template #title>
+              <h1 
+              class="text-2xl sm:text-3xl text-pretty font-bold text-highlighted">
+                  {{ title }}
+              </h1>
+            </template>
+            <template #toggle>
+              <UDashboardSidebarToggle variant="subtle" />
+            </template>
+          </UDashboardNavbar>
+        </template>
         
-      </div>
-
-      <div class="main-content">
-
-        <UContainer>
-          <slot />
-        </UContainer>
-      </div>
-    </div>
+        
+       <template #body>         
+         <UContainer>
+           <slot />
+          </UContainer>
+        </template>
+      
+      </UDashboardPanel>
+    </UDashboardGroup>
 </template>
 
 
-<style scoped>
-
-.layout {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* Sidebar styles */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  height: 100vh; /* Full viewport height */
-  width: 250px;
-  padding: .75rem;
-  flex-shrink: 0;
-  transition: transform 0.3s ease-in-out;
-}
-
-/* Main content */
-.main-content {
-  margin-left: 230px; /* Same as sidebar width */
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  flex: 1;
-  padding: 2rem;
-}
-
-.floating-button {
-  opacity: 0;
-  z-index: -1;
-}
-
-/* Responsive rules */
-@media (max-width: 991px) {
-
-  .floating-button {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1000;
-    opacity: 1;
-  }
-
-  .dashboard {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    position: absolute;
-    /* top: 0;
-    left: 0;
-    height: 100vh; */
-    transform: translateX(-100%);
-    z-index: 1000; 
-    background-color: rgba(255, 255, 255, 0.0); /* semi-transparent */
-    backdrop-filter: blur(0); /* blur effect */
-    -webkit-backdrop-filter: blur(0); /* Safari support */
-    
-  }
-
-  .sidebar.active {
-    transform: translateX(0);
-  }
-
-  .main-content {
-    margin-left: 0px; /* Same as sidebar width */
-    padding: 1rem;
-  }
-}
-
-
-</style>
