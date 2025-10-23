@@ -33,8 +33,8 @@ onMounted(async () => {
                     <h2 class="text-xl lg:text-2xl text-highlighted font-bold">
                         Students 
                     </h2>
-                    <div v-if="pending || studentCount === 0">
-                        <USkeleton />
+                    <div v-if="pending || studentCount === 0" class="grow">
+                        <USkeleton class="w-1/2 h-full ml-auto"/>
                     </div>
                     <h2 v-else class="text-xl lg:text-2xl text-highlighted font-bold">
                             {{ studentCount }}
@@ -44,10 +44,10 @@ onMounted(async () => {
             <UCard class="px-4 pt-4 pb-2 col-span-2" variant="soft">
                 <div class="flex justify-between gap-4">
                     <h2 class="text-xl lg:text-2xl text-highlighted font-bold">
-                        Students
+                        Teachers
                     </h2>
-                    <div v-if="pending || teacherCount === 0">
-                        <USkeleton />
+                    <div v-if="pending || teacherCount === 0" class="grow">
+                        <USkeleton class="w-1/2 h-full ml-auto"/>
                     </div>
                     <h2 v-else class="text-xl lg:text-2xl text-highlighted font-bold">
                         {{ teacherCount }}

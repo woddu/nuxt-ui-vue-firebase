@@ -204,7 +204,11 @@ watch(sections.pending, (newVal) => {
 
                 </template>
 
-                <UButton label="Add Section" @click="emptySection" size="xl"/>
+                <UButton
+                  icon="i-lucide-plus"
+                  label="Add Section"
+                  @click="emptySection"
+                  size="xl" />
             </UModal>
         </div>
         <div class="border border-muted relative z-[1] rounded-md ">

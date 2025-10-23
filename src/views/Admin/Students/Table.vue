@@ -135,11 +135,10 @@ const deleteStudentHandler = async () => {
 };
 
 onMounted(() => {
-  emit('loading', students.pending.value);
+  emit('loading', false);
 });
 
 watch(students.pending, (newVal) => {
-  emit('loading', newVal);
   pending.value = newVal;
 });
 
@@ -148,9 +147,13 @@ watch(students.pending, (newVal) => {
 <template>
 
   <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
-    <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" />
+    <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" size="xl"/>
 
-    <UButton label="Add Student" @click="addStudent()" size="xl"/>
+    <UButton
+      icon="i-lucide-plus"
+      label="Add Student"
+      @click="addStudent()"
+      size="xl" />
   </div>
   <div class="border border-muted relative z-[1] rounded-md ">
     <UTable ref="table" :data="students" :columns="tableColumn" :loading="pending" :error="error"
