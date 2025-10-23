@@ -1,16 +1,16 @@
 import { db } from '@/firebase'
 import { collection, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
-import type { Section } from '@/interfaces'
+import type { Teacher } from '@/interfaces'
 
 export const teachersRef = collection(db, "users");
 
-export async function addTeacher(teacher: Section) {
+export async function addTeacher(teacher: Teacher) {
   const docRef = doc(teachersRef)
   await setDoc(docRef, { ...teacher, id: docRef.id })
   return docRef.id
 }
 
-export async function updateTeacher(teacher: Section) {
+export async function updateTeacher(teacher: Teacher) {
     if (!teacher.id) {
         throw new Error('Teacher ID is required for update.')
     }
