@@ -56,8 +56,7 @@ const router: Router = createRouter({
           name: "Add-Student",
           component: () => import("@/views/Admin/Students/Add.vue"),
           meta: { requiresAuth: true, requiresAdmin: true },
-        },
-        
+        },        
       ],
     },
     {
@@ -90,7 +89,25 @@ const router: Router = createRouter({
           component: () => import("@/views/Admin/Teachers/Table.vue"),
           meta: { requiresAuth: true, requiresAdmin: true },
         },
+        {
+          path: "/teachers/add",
+          name: "Add-Teacher",
+          component: () => import("@/views/Admin/Teachers/Add.vue"),
+          meta: { requiresAuth: true, requiresAdmin: true },
+        },
+        {
+          path: "/teachers/edit/:id",
+          name: "Edit-Teacher",
+          component: () => import("@/views/Admin/Teachers/Edit.vue"),
+          meta: { requiresAuth: true, requiresAdmin: true },
+        }
       ]
+    },
+    {
+      path: '/subjects',
+      name: 'Subjects',
+      component: () => import("@/views/Admin/SubjectsView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },    
     }
   ],
   history: createWebHistory(),
