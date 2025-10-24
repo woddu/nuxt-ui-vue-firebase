@@ -5,9 +5,9 @@ import { reactive, ref } from 'vue';
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import { db } from '@/firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { getDocs, query, where } from 'firebase/firestore';
 import { Teacher } from '@/interfaces';
+import { teachersRef } from '@/services/teacherService';
 
 const auth = getAuth();
 
@@ -43,7 +43,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
     );
 
     // 2. Query Firestore for the user document
-    const q = query(collection(db, "users"), where("email", "==", user.email));
+    const q = query(teachersRef, where("email", "==", user.email));
     const snapshot = await getDocs(q);
 
     if (!snapshot.empty) {

@@ -1,10 +1,11 @@
 import { useCollection, useDocument } from 'vuefire'
-import { doc, getCountFromServer, query, where } from 'firebase/firestore'
+import { doc, getCountFromServer, orderBy, query, where } from 'firebase/firestore'
 import { Section } from '@/interfaces'
 import { sectionsRef } from '@/services/sectionService'
 
 export function useSections() {
-  return useCollection<Section>(sectionsRef)
+  const q = query(sectionsRef, orderBy('name', 'asc'))
+  return useCollection<Section>(q)
 }
 
 export function useSectionById(id: string) {

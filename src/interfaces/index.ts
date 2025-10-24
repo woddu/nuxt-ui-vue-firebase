@@ -43,7 +43,6 @@ interface Section {
   yearLevel: number;
   subjectIds: string[]; // array of Subject IDs
   adviserId?: string; // reference to LMSUser
-  studentIds?: string[]; // array of Student IDs
 }
 
 // Subject
@@ -108,12 +107,12 @@ interface TeacherSubject {
 
 
 interface SectionSubjectWrite {
-  teacherId: string;
+  subjectTeacherId: string;
   assignedAt: FieldValue; // for serverTimestamp()
 }
 
 interface SectionSubjectRead {
-  teacherId: string;
+  subjectTeacherId: string;
   assignedAt: Timestamp; // what Firestore actually stores
 }
 

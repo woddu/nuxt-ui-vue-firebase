@@ -1,10 +1,11 @@
 import { useCollection, useDocument } from 'vuefire'
-import { doc, getCountFromServer, query, where } from 'firebase/firestore'
+import { doc, getCountFromServer, orderBy, query, where } from 'firebase/firestore'
 import { Subject } from '@/interfaces'
 import { subjectsRef } from '@/services/subjectService'
 
 export function useSubjects() {
-  return useCollection<Subject>(subjectsRef)
+  const q = query(subjectsRef, orderBy('name', 'asc'))
+  return useCollection<Subject>(q)
 }
 
 export function useSubjectById(id: string) {

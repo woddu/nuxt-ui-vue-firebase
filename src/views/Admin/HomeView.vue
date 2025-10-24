@@ -2,6 +2,9 @@
 import AuthenticatedLayout from '@/components/layouts/AuthenticatedLayout.vue';
 import { getStudentCount } from '@/composables/useStudents';
 import { getTeachersCount } from '@/composables/useTeachers';
+import { db } from '@/firebase';
+import { Section, Student, Subject } from '@/interfaces';
+import { collection, doc, writeBatch } from 'firebase/firestore';
 import { onMounted, ref } from 'vue';
 
 
@@ -41,7 +44,7 @@ onMounted(async () => {
                     </h2>
                 </div>            
             </UCard>
-            <UCard class="px-4 pt-4 pb-2 col-span-2" variant="soft">
+            <UCard class="px-4 pt-4 pb-2" variant="soft">
                 <div class="flex justify-between gap-4">
                     <h2 class="text-xl lg:text-2xl text-highlighted font-bold">
                         Teachers
@@ -54,6 +57,6 @@ onMounted(async () => {
                     </h2>
                 </div>
             </UCard>
-        </div>            
+        </div>
     </AuthenticatedLayout>
 </template>
