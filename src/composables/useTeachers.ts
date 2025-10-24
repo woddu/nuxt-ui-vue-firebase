@@ -1,9 +1,7 @@
 import { useCollection, useDocument } from 'vuefire'
-import { collection, doc, endAt, getCountFromServer, orderBy, query, startAt, where } from 'firebase/firestore'
-import { db } from '@/firebase' 
-
-const teachersRef = collection(db, 'users')
-
+import { doc, endAt, getCountFromServer, orderBy, query, startAt, where } from 'firebase/firestore'
+import { teachersRef } from '@/services/teacherService'
+import { Teacher } from '@/interfaces'
 
 export function useTeachers() {
   const q = query(
@@ -11,17 +9,17 @@ export function useTeachers() {
     orderBy('verified', 'asc'),
     // where('username', '!=', 'admin')
   )
-  return useCollection(q)
+  return useCollection<Teacher>(q)
 }
 
 export function useTeacherById(id: string) {
     const docRef = doc(teachersRef, id) 
-    return useDocument(docRef)
+    return useDocument<Teacher>(docRef)
 }
 
 export function useTeachersByVerified(verified: boolean) {
   const q = query(teachersRef, where('verified', '==', verified))
-  return useCollection(q)
+  return useCollection<Teacher>(q)
 }
 
 export function useTeachersByLastName(name: string) {
@@ -31,7 +29,7 @@ export function useTeachersByLastName(name: string) {
     startAt(name),
     endAt(name + "\uf8ff")
   );  
-  return useCollection(q);
+  return useCollection<Teacher>(q);
 }
 
 export async function getTeachersCountByVerified(verified: boolean) {

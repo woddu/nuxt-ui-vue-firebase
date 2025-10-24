@@ -1,21 +1,25 @@
 import { useCollection, useDocument } from 'vuefire'
-import { collection, doc, getCountFromServer, query, where } from 'firebase/firestore'
-import { db } from '@/firebase' // your firebase init
-
-const subjectsRef = collection(db, 'subjects')
+import { doc, getCountFromServer, query, where } from 'firebase/firestore'
+import { Subject } from '@/interfaces'
+import { subjectsRef } from '@/services/subjectService'
 
 export function useSubjects() {
-  return useCollection(subjectsRef)
+  return useCollection<Subject>(subjectsRef)
 }
 
 export function useSubjectById(id: string) {
     const docRef = doc(subjectsRef, id)
-    return useDocument(docRef)
+    return useDocument<Subject>(docRef)
 }
 
-export function useSubjectsByGrade(yearLevel: number) {
-  const q = query(subjectsRef, where('yearLevel', '==', yearLevel))
-  return useCollection(q)
+export function useSubjectsByTeacher(teacherId: string) {
+  const q = query(
+    subjectsRef,
+    where("teacherIds", "array-contains", teacherId)
+  );
+
+  return useCollection<Subject>(q);
+
 }
 
 export async function getSubjectCount(yearLevel?: number) {

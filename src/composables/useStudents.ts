@@ -1,25 +1,24 @@
 import { useCollection, useDocument } from 'vuefire'
-import { collection, doc, endAt, getCountFromServer, orderBy, query, startAt, where } from 'firebase/firestore'
-import { db } from '@/firebase' // your firebase init
-
-const studentsRef = collection(db, 'students')
+import { doc, endAt, getCountFromServer, orderBy, query, startAt, where } from 'firebase/firestore'
+import { Student } from '@/interfaces'
+import { studentsRef } from '@/services/studentService'
 
 export function useStudents() {
   const q = query(
     studentsRef, 
     orderBy('lastName', 'asc')
   )
-  return useCollection(q)
+  return useCollection<Student>(q)
 }
 
 export function useStudentById(id: string) {
   const docRef = doc(studentsRef, id)
-  return useDocument(docRef)
+  return useDocument<Student>(docRef)
 }
 
 export function useStudentsBySection(sectionId: string) {
   const q = query(studentsRef, where('sectionId', '==', sectionId))
-  return useCollection(q)
+  return useCollection<Student>(q)
 }
 
 export function useStudentsByLastName(name: string) {
@@ -30,7 +29,7 @@ export function useStudentsByLastName(name: string) {
     endAt(name + "\uf8ff")
   );
 
-  return useCollection(q);
+  return useCollection<Student>(q);
 }
 
 

@@ -1,16 +1,15 @@
 import { useCollection, useDocument } from 'vuefire'
-import { collection, doc, getCountFromServer, query, where } from 'firebase/firestore'
-import { db } from '@/firebase' // your firebase init
-
-const sectionsRef = collection(db, 'sections')
+import { doc, getCountFromServer, query, where } from 'firebase/firestore'
+import { Section } from '@/interfaces'
+import { sectionsRef } from '@/services/sectionService'
 
 export function useSections() {
-  return useCollection(sectionsRef)
+  return useCollection<Section>(sectionsRef)
 }
 
 export function useSectionById(id: string) {
   const docRef = doc(sectionsRef, id)
-  return useDocument(docRef)
+  return useDocument<Section>(docRef)
 }
 
 export async function getSectionCount(sectionId?: string) {
