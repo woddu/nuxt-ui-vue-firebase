@@ -2,7 +2,7 @@ import { db } from '@/firebase'
 import { collection, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
 import type { Student } from '@/interfaces'
 
-const studentsRef = collection(db, 'students')
+export const studentsRef = collection(db, 'students')
 
 export async function addStudent(student: Student) {
   const docRef = doc(studentsRef)

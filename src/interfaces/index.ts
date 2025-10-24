@@ -1,3 +1,5 @@
+import { FieldValue, Timestamp } from "firebase/firestore";
+
 interface Teacher {
     id: string;
     verified: boolean;
@@ -39,6 +41,7 @@ interface Section {
   name: string;
   strand: string;
   yearLevel: number;
+  subjectIds: string[]; // array of Subject IDs
   adviserId?: string; // reference to LMSUser
   studentIds?: string[]; // array of Student IDs
 }
@@ -48,20 +51,70 @@ interface Subject {
   id: string;
   name: string;
   track: string;
+  teacherIds: string[]; // array of Teacher IDs
 }
 
-// TeacherSubject (link between teacher and subject)
 interface TeacherSubject {
   id: string;
-  teacherId: string; // LMSUser UID
-  subjectId: string;
+  teacherSubjectId: string;
+
+  WW1_First: number;
+  WW2_First: number;
+  WW3_First: number;
+  WW4_First: number;
+  WW5_First: number;
+  WW6_First: number;
+  WW7_First: number;
+  WW8_First: number;
+  WW9_First: number;
+  WW10_First: number;
+  
+  WW1_Second: number;
+  WW2_Second: number;
+  WW3_Second: number;
+  WW4_Second: number;
+  WW5_Second: number;
+  WW6_Second: number;
+  WW7_Second: number;
+  WW8_Second: number;
+  WW9_Second: number;
+  WW10_Second: number;
+
+  PT1_First: number;
+  PT2_First: number;
+  PT3_First: number;
+  PT4_First: number;
+  PT5_First: number;
+  PT6_First: number;
+  PT7_First: number;
+  PT8_First: number;
+  PT9_First: number;
+  PT10_First: number;
+
+  PT1_Second: number;
+  PT2_Second: number;
+  PT3_Second: number;
+  PT4_Second: number;
+  PT5_Second: number;
+  PT6_Second: number;
+  PT7_Second: number;
+  PT8_Second: number;
+  PT9_Second: number;
+  PT10_Second: number;
+
+  Exam_First: number;
+  Exam_Second: number;
 }
 
-// TeacherSubjectSection (link between TeacherSubject and Section)
-interface TeacherSubjectSection {
-  teacherSubjectId: string;
-  sectionId: string;
-  subjectId: string;
+
+interface SectionSubjectWrite {
+  teacherId: string;
+  assignedAt: FieldValue; // for serverTimestamp()
+}
+
+interface SectionSubjectRead {
+  teacherId: string;
+  assignedAt: Timestamp; // what Firestore actually stores
 }
 
 // Score
@@ -101,8 +154,9 @@ export type {
   Student, 
   Section, 
   Subject, 
-  TeacherSubject, 
-  TeacherSubjectSection, 
+  TeacherSubject,
+  SectionSubjectRead, 
+  SectionSubjectWrite,
   Score, 
   SelectOptions, 
   Role, 
