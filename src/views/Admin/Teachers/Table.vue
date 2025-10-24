@@ -93,6 +93,15 @@ const tableColumn: TableColumn<DocumentData>[] = [
                     emit('loading', true);
                     updateTeacherVerification(row.original.id, !row.original.verified)
                 }
+            },  {
+                label: 'Assign',
+                onSelect: () => {
+                    emit('loading', true);
+                    router.push({
+                        name: 'Assign-Teacher',
+                        params: { id: row.original.id }
+                    });
+                }
             }, {
                 label: 'Edit Teacher',
                 onSelect: () => {
