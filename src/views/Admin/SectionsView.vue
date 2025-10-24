@@ -29,6 +29,7 @@ const section = reactive<Section>({
     name: '',
     yearLevel: 0,
     strand: '',    
+    subjectIds: []
 });
 
 const toast = useToast();
@@ -170,6 +171,7 @@ function emptySection() {
 
 watch(sections.pending, (newVal) => {    
     pending.value = newVal;
+    console.log('sections', sections.data.value)
 });
 
 </script>

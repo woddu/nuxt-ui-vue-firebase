@@ -107,7 +107,7 @@ const filteredNavItems = computed<AppNavigationMenuItem[]>(() => {
             </template>
             <template #right>
               <div class="flex items-center gap-2">
-                <UIcon name="i-lucide-user-round" class="size-6"/>
+                <UIcon name="i-lucide-circle-user-round" class="size-6"/>
                 <h1 class="text-lg text-highlighted font-medium">
                   {{ userStore.user?.username }}
                 </h1>

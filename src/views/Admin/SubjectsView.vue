@@ -28,7 +28,8 @@ const globalFilter = ref('');
 const subject = reactive<Subject>({
     id: '',
     name: '',
-    track: ''
+    track: '',
+    teacherIds: []
 });
 
 const toast = useToast();
@@ -43,7 +44,6 @@ function column(key: string): TableColumn<DocumentData> {
 
 const tableColumn: TableColumn<DocumentData>[] = [
     column('name'),
-    column('yearLevel'),
     column('track'),
     {
         id: 'actions',
