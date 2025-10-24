@@ -32,7 +32,7 @@ const router: Router = createRouter({
       name: "Students",
       component: () => import("@/views/Admin/Students/StudentsView.vue"),
       meta: { requiresAuth: true, requiresAdmin: true },
-      redirect: { name: "students-list" },
+      redirect: { name: "Students-List" },
       children: [
         {
           path: "",
@@ -99,6 +99,12 @@ const router: Router = createRouter({
           path: "/teachers/edit/:id",
           name: "Edit-Teacher",
           component: () => import("@/views/Admin/Teachers/Edit.vue"),
+          meta: { requiresAuth: true, requiresAdmin: true },
+        },
+        {
+          path: "/teachers/assign/:id",
+          name: "Assign-Teacher",
+          component: () => import("@/views/Admin/Teachers/Assign.vue"),
           meta: { requiresAuth: true, requiresAdmin: true },
         }
       ]
