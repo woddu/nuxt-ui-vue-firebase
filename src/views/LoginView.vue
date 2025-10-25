@@ -8,6 +8,8 @@ import { useUserStore } from '@/stores/user';
 import { getDocs, query, where } from 'firebase/firestore';
 import { Teacher } from '@/interfaces';
 import { teachersRef } from '@/services/teacherService';
+import { useSubjectStore } from '@/stores/subject';
+import { useSectionStore } from '@/stores/sections';
 
 const auth = getAuth();
 
@@ -16,6 +18,10 @@ const router = useRouter();
 const isLoading = ref(false);
 
 const userStore = useUserStore();
+
+const subjectsStore = useSubjectStore();
+
+const sectionsStore = useSectionStore();
 
 const state = reactive({
   email: '',
@@ -49,6 +55,10 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
     if (!snapshot.empty) {
       const userDoc = snapshot.docs[0].data();
       userStore.setUser(userDoc as Teacher); // Save Firestore user data into Pinia
+      if (userStore.user?.role === 'admin') {
+        subjectsStore.start();
+        sectionsStore.start();
+      }
     } else {
       console.warn("No matching user document found in Firestore");
       userStore.setUser(null);
