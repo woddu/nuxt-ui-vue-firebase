@@ -19,6 +19,16 @@ export async function updateSection(section: Section) {
   await updateDoc(docRef, data) // safer update
 }
 
+export async function setAdvisoryTeacher(advisoryId: string, teacherId: string) {
+  const docRef = doc(sectionsRef, advisoryId)
+  await updateDoc(docRef, { adviserId: teacherId })
+}
+
+export async function removeAdvisoryTeacher(advisoryId: string) {
+  const docRef = doc(sectionsRef, advisoryId)
+  await updateDoc(docRef, { adviserId: null })
+}
+
 export async function deleteSection(id: string) {
   await deleteDoc(doc(sectionsRef, id))
 }
