@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui';
 import { DocumentData } from 'firebase/firestore';
-import { ref, h, resolveComponent, watch, onMounted } from 'vue';
+import { ref, h, resolveComponent, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { reactive } from 'vue';
 import { useStudents } from '@/composables/useStudents';
 import { deleteStudent } from '@/services/studentService';
-import { useSections } from '@/composables/useSections';
+import { columnCapitalize } from '@/views/util';
+import { useSectionStore } from '@/stores/sections';
 
 const emit = defineEmits<{
   (e: 'loading', value: boolean): void
@@ -17,13 +18,15 @@ const router = useRouter()
 const UButton = resolveComponent('UButton');
 const UDropdownMenu = resolveComponent('UDropdownMenu');
 
+const sectionsStore = useSectionStore()
+
 const students = useStudents();
 
-const pending = ref(students.pending.value);
+const sections = sectionsStore.sections();
 
-const error = ref(students.error.value);  
+const pending = computed(() => students.pending.value || sections?.pending.value);
 
-const sections = useSections();
+const error = computed(() => students.error.value || sections?.error.value);
 
 const showWarningModal = ref(false);
 
@@ -33,25 +36,6 @@ const isLoading = ref(false);
 
 const globalFilter = ref('');
 
-function column(key: string, capitalize: boolean = false): TableColumn<DocumentData> {
-  return {
-    accessorKey: key,
-    header: key === 'sectionId' ? 'Section' : key.charAt(0).toUpperCase() + key.slice(1),
-    cell: ({ row }) => {
-      if (key === 'sectionId') {
-        const sectionId = row.getValue<String>('sectionId');
-        const section = sections.data.value.find(sec => sec.id === sectionId);
-        return section ? section.name : 'N/A';
-      } else {
-        if (capitalize && row.getValue(key) != undefined) {
-          return row.getValue<String>(key) ? row.getValue<String>(key).charAt(0).toUpperCase() + row.getValue<String>(key).slice(1) : 'N/A';
-        }
-        return row.getValue<String>(key) ? row.getValue<String>(key) : 'N/A';
-      }
-    }
-  }
-}
-
 const student = reactive({
   id: '',
   lastName: '',
@@ -59,12 +43,19 @@ const student = reactive({
 });
 
 const tableColumn: TableColumn<DocumentData>[] = [
-  column('lastName'),
-  column('firstName'),
-  column('middleName'),
-  column('age'),
-  column('sectionId'),
-  column('gender', true),
+  columnCapitalize('lastName'),
+  columnCapitalize('firstName'),
+  columnCapitalize('middleName'),
+  {
+    accessorKey: 'sectionId',
+    header: 'Section',
+    cell: ({ row }) => {      
+      const sectionId = row.getValue<String>('sectionId');
+      const section = sections?.data.value.find(sec => sec.id === sectionId);
+      return section ? section.name : 'N/A';    
+    }
+  },
+  columnCapitalize('gender', true),
   {
     id: 'actions',
     enableHiding: false,
@@ -138,10 +129,6 @@ onMounted(() => {
   emit('loading', false);
 });
 
-watch(students.pending, (newVal) => {
-  pending.value = newVal;
-});
-
 </script>
 
 <template>
@@ -155,9 +142,9 @@ watch(students.pending, (newVal) => {
       @click="addStudent()"
       size="xl" />
   </div>
-  <div class="border border-muted relative z-[1] rounded-md ">
-    <UTable ref="table" :data="students" :columns="tableColumn" :loading="pending" :error="error"
-      :global-filter="globalFilter" />
+  <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-11rem)]">
+    <UTable sticky ref="table" :data="students" :columns="tableColumn" :loading="pending" :error="error"
+      :global-filter="globalFilter" class="max-h-[calc(100vh-11rem)]"/>
     <UModal v-model:open="showWarningModal" title="Confirm Deletion">
       <template #body>
         <p>Are you sure you want to delete {{ student.lastName }}?</p>

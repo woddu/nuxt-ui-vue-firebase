@@ -1,18 +1,22 @@
 <script setup lang="ts">
-import { ref, reactive, h, resolveComponent, watch } from 'vue';
+import { ref, reactive, h, resolveComponent, computed } from 'vue';
 import { Section } from '@/interfaces';
 import type { FormError, TableColumn } from '@nuxt/ui';
 import { DocumentData } from 'firebase/firestore';
-import { useSections } from '@/composables/useSections';
 import { addSection, deleteSection, updateSection } from '@/services/sectionService';
+import { columnCapitalize } from '../util';
+import { useSectionStore } from '@/stores/sections';
+
 const UButton = resolveComponent('UButton');
 const UDropdownMenu = resolveComponent('UDropdownMenu');
 
-const sections = useSections();
+const sectionStore = useSectionStore();
 
-const pending = ref(sections.pending.value);
+const sections = sectionStore.sections();
 
-const error = ref(sections.error.value);
+const pending = computed(() => sections.pending.value);
+
+const error = computed(() => sections.error.value);
 
 const showFormModal = ref(false);
 
@@ -34,18 +38,29 @@ const section = reactive<Section>({
 
 const toast = useToast();
 
-function column(key: string): TableColumn<DocumentData> {
-    return {
-        accessorKey: key,
-        header: key.charAt(0).toUpperCase() + key.slice(1),
-        cell: ({ row }) => row.getValue(key) ? row.getValue(key) : 'N/A',
-    }
-}
-
 const tableColumn: TableColumn<DocumentData>[] = [
-    column('name'),
-    column('yearLevel'),
-    column('strand'),
+    columnCapitalize('name'),
+    columnCapitalize('yearLevel'),
+    {
+        accessorKey: 'strand',
+        header: ({ column }) => {
+            const isSorted = column.getIsSorted()
+
+            return h(UButton, {
+                color: 'neutral',
+                variant: 'ghost',
+                label: 'Strand',
+                icon: isSorted
+                ? isSorted === 'asc'
+                    ? 'i-lucide-arrow-up-narrow-wide'
+                    : 'i-lucide-arrow-down-wide-narrow'
+                : 'i-lucide-arrow-up-down',
+                class: '-mx-2.5',
+                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+            })
+        },
+        cell: ({ row }) => row.getValue('strand') ? row.getValue('strand') : 'N/A',
+    },
     {
         id: 'actions',
         enableHiding: false,
@@ -66,7 +81,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
                     showFormModal.value = true;
                 }
             }, {
-                label: 'Delete Student',
+                label: 'Delete Section',
                 onSelect: () => {
                     emptySection();
                     section.id = row.original.id;
@@ -115,8 +130,7 @@ const addSectionHandler = async () => {
             sections.data.value = [...sections.data.value]
             emptySection()
         })
-        .catch((error) => {
-            console.error("Error adding section: ", error);
+        .catch((error) => {            
             toast.add({ title: 'Error', description: `Failed to add section: ${error.message}`, color: 'error' })
         })
         .finally(() => {
@@ -168,19 +182,13 @@ function emptySection() {
     section.strand = '';    
     isEditing.value = false
 }
-
-watch(sections.pending, (newVal) => {    
-    pending.value = newVal;
-    console.log('sections', sections.data.value)
-});
-
 </script>
 
 <template>
     <AuthenticatedLayout :progress="pending" title="Sections">
 
         <div class="flex items-center justify-between gap-2 px-4 py-3.5 overflow-x-auto">
-            <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" />
+            <UInput v-model="globalFilter" class="max-w-sm min-w-[12ch]" placeholder="Filter" size="xl"/>
 
             <UModal v-model:open="showFormModal" :title="isEditing ? 'Edit Section' : 'Add Section'"
                 :description="isEditing ? 'Edit the Section details below:' : 'Fill in the Section details below:'">
@@ -213,9 +221,9 @@ watch(sections.pending, (newVal) => {
                   size="xl" />
             </UModal>
         </div>
-        <div class="border border-muted relative z-[1] rounded-md ">
-            <UTable ref="table" :data="sections" :columns="tableColumn" :loading="pending" :error="error"
-                :global-filter="globalFilter" />
+        <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-11rem)]">
+            <UTable sticky ref="table" :data="sections" :columns="tableColumn" :loading="pending" :error="error"
+                :global-filter="globalFilter" class="max-h-[calc(100vh-11rem)]"/>
             <UModal v-model:open="showWarningModal" title="Confirm Deletion">
                 <template #body>
                     <p>Are you sure you want to delete {{ section.name }}?</p>
