@@ -13,6 +13,11 @@ export function useSectionById(id: string) {
   return useDocument<Section>(docRef)
 }
 
+export function useSectionsByAdviser(teacherId: string) {
+  const q = query(sectionsRef, where('adviserId', '==', teacherId))
+  return useCollection<Section>(q)
+}
+
 export async function getSectionCount(sectionId?: string) {
   const q = sectionId
     ? query(sectionsRef, where('id', '==', sectionId))
