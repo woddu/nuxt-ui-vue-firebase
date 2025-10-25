@@ -105,14 +105,19 @@ interface TeacherSubject {
   Exam_Second: number;
 }
 
-
-interface SectionSubjectWrite {
+interface SectionSubject {
   subjectTeacherId: string;
+  sectionId: string;
+  sectionName: string;
+}
+
+interface SectionSubjectWrite extends SectionSubject {
+  
   assignedAt: FieldValue; // for serverTimestamp()
 }
 
 interface SectionSubjectRead {
-  subjectTeacherId: string;
+  
   assignedAt: Timestamp; // what Firestore actually stores
 }
 

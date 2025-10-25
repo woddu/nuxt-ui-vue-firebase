@@ -7,6 +7,7 @@ import { reactive } from 'vue';
 import { useTeachers } from '@/composables/useTeachers';
 import { deleteTeacher, updateTeacherVerification } from '@/services/teacherService';
 import { computed } from 'vue';
+import { columnCapitalize } from '@/views/util';
 
 const emit = defineEmits<{
     (e: 'loading', value: boolean): void
@@ -24,9 +25,9 @@ const filtered = computed(() =>
   teachers.value.filter(t => t.username !== "admin")
 )
 
-const pending = ref(teachers.pending.value);
+const pending = computed(() => teachers.pending.value);
 
-const error = ref(teachers.error.value);
+const error = computed(() => teachers.error.value);
 
 const showWarningModal = ref(false);
 
@@ -42,42 +43,19 @@ const teacher = reactive({
     firstName: ''
 });
 
-function column(key: string, capitalize: boolean = false): TableColumn<DocumentData> {
-    return {
-        accessorKey: key,
-        header: key.charAt(0).toUpperCase() + key.slice(1),
-        filterFn: key === 'verified' ? 'equals' : undefined,
-        cell: ({ row }) => {
-            const value = row.getValue<any>(key);
-
-            if (value === undefined || value === null) {
-                return 'N/A';
-            }
-
-            // Handle booleans
-            if (typeof value === 'boolean') {
-                return h(UBadge, { class: 'capitalize', variant: 'subtle', color: value ? 'success' : 'error' }, () =>
-                    value ? 'Yes' : 'No'
-                )
-            }
-
-            // Handle strings
-            if (typeof value === 'string') {
-                return capitalize
-                    ? value.charAt(0).toUpperCase() + value.slice(1)
-                    : value;
-            }
-
-            // Fallback for numbers or other types
-            return String(value);
-        }
-    }
-}
-
 const tableColumn: TableColumn<DocumentData>[] = [
-    column('lastName'),
-    column('firstName'),
-    column('verified'),
+    columnCapitalize('lastName'),
+    columnCapitalize('firstName'),
+    {
+        accessorKey: 'verified',
+        header: 'Verified',
+        filterFn: 'equals',
+        cell: ({ row }) => {
+            return h(UBadge, { class: 'capitalize', variant: 'subtle', color: row.getValue<any>('verified') ? 'success' : 'error' }, () =>
+                    row.getValue<Boolean>('verified') ? 'Yes' : 'No'
+                )
+        }
+    },
     {
         id: 'actions',
         enableHiding: false,
@@ -183,10 +161,6 @@ onMounted(() => {
   emit('loading', false);
 });
 
-watch(teachers.pending, (newVal) => {    
-    pending.value = newVal;
-});
-
 </script>
 
 <template>
@@ -197,7 +171,7 @@ watch(teachers.pending, (newVal) => {
 
             <USelect 
                 v-model="statusFilter" 
-                class="max-w-auto min-w-[8rem]" 
+                class="max-w-auto min-w-32" 
                 placeholder="Filter by Verified" 
                 :items="[
                     { label: 'All', value: 'all' },
@@ -213,14 +187,16 @@ watch(teachers.pending, (newVal) => {
                 size="xl" />
         </div>
     </div>
-    <div class="border border-muted relative z-[1] rounded-md ">
+    <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-11rem)]">
         <UTable
+          sticky
           ref="table"
           :data="filtered"
           :columns="tableColumn"
           :loading="pending"
           :error="error"
-          :global-filter="globalFilter" />
+          :global-filter="globalFilter" 
+          class="max-h-[calc(100vh-11rem)]"/>
         <UModal v-model:open="showWarningModal" title="Confirm Deletion">
             <template #body>
                 <p>Are you sure you want to delete {{ teacher.lastName }}?</p>

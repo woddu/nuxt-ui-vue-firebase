@@ -3,7 +3,7 @@ import { query, collection, doc } from "firebase/firestore";
 import { useCollection } from "vuefire";
 import { teachersRef } from "@/services/teacherService";
 
-export async function useTeacherSubjects(teacherId: string) {
+export function useTeacherSubjects(teacherId: string) {
   const teacherRef = doc(teachersRef, teacherId);
 
   const teacherSubjects = collection(teacherRef, "subjects");
