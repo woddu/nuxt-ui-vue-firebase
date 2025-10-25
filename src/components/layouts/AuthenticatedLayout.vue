@@ -4,6 +4,8 @@ import { computed, ref } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
+import { useSubjectStore } from '@/stores/subject';
+import { useSectionStore } from '@/stores/sections';
 
 defineProps({
   progress: {
@@ -22,10 +24,16 @@ const router = useRouter();
 
 const userStore = useUserStore();
 
+const subjectStore = useSubjectStore();
+
+const sectionStore = useSectionStore();
+
 const handleLogout = async () => {
   await signOut(auth)
     .then(() => {
-      console.log('User logged out successfully');
+      userStore.user = null;
+      subjectStore.stop();
+      sectionStore.stop();
       router.push('/login');
     })
     .catch((error) => {
