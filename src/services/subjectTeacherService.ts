@@ -72,7 +72,7 @@ export async function addSubjectTeacher(subjectId: string, teacherId: string) {
   });
 }
 
-export async function deleteSubjectTeacher(subjectId: string, teacherId: string) {
+export async function removeSubjectTeacher(subjectId: string, teacherId: string) {
   const subjectRef = doc(subjectsRef, subjectId);
   const teacherRef = doc(teachersRef, teacherId);
   const teacherSubjectsRef = collection(teacherRef, 'subjects');

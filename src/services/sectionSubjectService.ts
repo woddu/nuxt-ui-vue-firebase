@@ -7,7 +7,7 @@ import { sectionsRef } from './sectionService';
 export async function addSectionSubject(section: Section, subjectId: string, teacherId: string) {    
     const sectionRef = doc(sectionsRef, section.id);
 
-    const sectionSubjectsRef = collection(sectionRef, 'subjects');
+    const sectionSubjectsRef = collection(sectionRef, 'sectionSubjects');
 
     const sectionSubjectRef = doc(sectionSubjectsRef, subjectId);
     
@@ -32,9 +32,9 @@ export async function addSectionSubject(section: Section, subjectId: string, tea
     })
 }
 
-export async function deleteSectionSubject(sectionId: string, subjectId: string) {
+export async function removeSectionSubject(sectionId: string, subjectId: string) {
     const sectionRef = doc(sectionsRef, sectionId);
-    const sectionSubjectsRef = collection(sectionRef, 'subjects');
+    const sectionSubjectsRef = collection(sectionRef, 'sectionSubjects');
     const sectionSubjectRef = doc(sectionSubjectsRef, subjectId);
     await runTransaction(db, async (tx) => {
         tx.update(sectionRef, {
