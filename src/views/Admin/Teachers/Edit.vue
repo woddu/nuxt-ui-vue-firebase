@@ -140,7 +140,7 @@ watch(teacherPending, (newVal) => {
       </UFormField>
     </div>        
     <div class="flex justify-end">
-      <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" type="submit" label="Add"
+      <UButton :loading="isLoading"  :disabled="isLoading" type="submit" label="Add"
         class="mt-6" size="xl"/>
     </div>
   </UForm>

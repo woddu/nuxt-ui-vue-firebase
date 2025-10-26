@@ -150,9 +150,9 @@ onMounted(() => {
         <p>Are you sure you want to delete {{ student.lastName }}?</p>
       </template>
       <template #footer>
-        <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel"
+        <UButton :loading="isLoading"  :disabled="isLoading" label="Cancel"
           @click="showWarningModal = false" size="xl"/>
-        <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error"
+        <UButton :loading="isLoading"  :disabled="isLoading" label="Delete" color="error"
           @click="deleteStudentHandler" size="xl"/>
       </template>
     </UModal>

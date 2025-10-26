@@ -132,7 +132,7 @@ watch(studentDoc, (newVal) => {
       </UFormField>
     </div>
     <div class="flex justify-start">
-      <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading || studentPending" type="submit"
+      <UButton :loading="isLoading"  :disabled="isLoading || studentPending" type="submit"
         label="Save" class="mt-6" size="xl" />
     </div>
   </UForm>

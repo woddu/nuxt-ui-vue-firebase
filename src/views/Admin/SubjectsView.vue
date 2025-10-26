@@ -187,7 +187,7 @@ function emptySubject() {
                             </UFormField>
                         </div>
                         <div class="flex justify-end">
-                            <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'"
+                            <UButton :loading="isLoading"  :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'"
                                 class="mt-6" size="xl"/>
                         </div>
                     </UForm>
@@ -209,8 +209,8 @@ function emptySubject() {
                     <p>Are you sure you want to delete {{ subject.name }}?</p>
                 </template>
                 <template #footer>
-                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel" @click="showWarningModal = false" size="xl"/>
-                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error" @click="deleteSubjectHandler" size="xl"/>
+                    <UButton :loading="isLoading"  :disabled="isLoading" label="Cancel" @click="showWarningModal = false" size="xl"/>
+                    <UButton :loading="isLoading"  :disabled="isLoading" label="Delete" color="error" @click="deleteSubjectHandler" size="xl"/>
                 </template>
             </UModal>
         </div>

@@ -90,19 +90,23 @@ const tableColumn: TableColumn<DocumentData>[] = [
                 }
             }]
 
-            return h('div', { class: 'text-right' }, h(UDropdownMenu, {
-                'content': {
-                    align: 'end'
-                },
-                items,
-                'aria-label': 'Actions dropdown'
-            }, () => h(UButton, {
-                'icon': 'i-lucide-ellipsis-vertical',
-                'color': 'neutral',
-                'variant': 'ghost',
-                'class': 'ml-auto',
-                'aria-label': 'Actions dropdown'
-            })))
+            return h(
+                'div', { class: 'text-right' }, 
+                h(UDropdownMenu, {
+                    'content': {
+                        align: 'end'
+                    },
+                    items,
+                    'aria-label': 'Actions dropdown'
+                    }, () => h(UButton, {
+                        'icon': 'i-lucide-ellipsis-vertical',
+                        'color': 'neutral',
+                        'variant': 'ghost',
+                        'class': 'ml-auto',
+                        'aria-label': 'Actions dropdown'
+                    })
+                )
+            )
         }
     }
 ];
@@ -207,7 +211,7 @@ function emptySection() {
                             </UFormField>
                         </div>
                         <div class="flex justify-end">
-                            <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'"
+                            <UButton :loading="isLoading"  :disabled="isLoading" type="submit" :label="isEditing ? 'Save' : 'Add'"
                                 class="mt-6" size="xl"/>
                         </div>
                     </UForm>
@@ -229,8 +233,8 @@ function emptySection() {
                     <p>Are you sure you want to delete {{ section.name }}?</p>
                 </template>
                 <template #footer>
-                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Cancel" @click="showWarningModal = false" size="xl"/>
-                    <UButton :loading="isLoading" loading-icon="i-lucide-loader" :disabled="isLoading" label="Delete" color="error" @click="deleteSectionHandler" size="xl"/>
+                    <UButton :loading="isLoading"  :disabled="isLoading" label="Cancel" @click="showWarningModal = false" size="xl"/>
+                    <UButton :loading="isLoading"  :disabled="isLoading" label="Delete" color="error" @click="deleteSectionHandler" size="xl"/>
                 </template>
             </UModal>
         </div>
