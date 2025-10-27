@@ -32,4 +32,6 @@ export const useSectionStore = defineStore('sections', () => {
     }
 
     return { sections, start, stop }
+}, {
+  persist: true
 })

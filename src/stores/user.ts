@@ -9,8 +9,15 @@ export const useUserStore = defineStore('user', () => {
     user.value = newUser;
   }
 
+  function clearUser() {
+    user.value = null;
+  }
+
   return {
     user,
-    setUser
+    setUser,
+    clearUser
   };
+}, {
+  persist: true
 });

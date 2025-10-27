@@ -32,4 +32,6 @@ export const useSubjectStore = defineStore('subjects', () => {
     }
 
     return { subjects , start, stop }
+}, {
+  persist: true
 })
