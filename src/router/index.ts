@@ -1,11 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router"
-import type { Router, RouterOptions } from "vue-router"
+import type { RouteMeta, Router, RouterOptions } from "vue-router"
 import { getAuth, User } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
 import { useUserStore } from "@/stores/user";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
-import { Teacher } from "@/interfaces";
+import { Role, Teacher } from "@/interfaces";
+
+
+function roleMeta(role: Role): RouteMeta {
+  return {
+    requiresAuth: true,
+    requiresVerified: true,
+    roles: [role],
+  };
+}
+
+const adminMeta: RouteMeta   = roleMeta('admin');
+const headTeacherMeta: RouteMeta = roleMeta('headteacher');
+const teacherMeta: RouteMeta = roleMeta('teacher');
 
 const router: Router = createRouter({
   routes: [
@@ -25,13 +38,13 @@ const router: Router = createRouter({
       path: "/",
       name: "Home",
       component: () => import("@/views/Admin/HomeView.vue"),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: adminMeta,
     },
     {
       path: "/students",
       name: "Students",
       component: () => import("@/views/Admin/Students/StudentsView.vue"),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: adminMeta,
       redirect: { name: "Students-List" },
       children: [
         {
@@ -43,19 +56,19 @@ const router: Router = createRouter({
           path: "/students/list",
           name: "Students-List",
           component: () => import("@/views/Admin/Students/Table.vue"),
-          meta: { requiresAuth: true, requiresAdmin: true },
+          meta: adminMeta,
         },
         {
           path: "/students/edit/:id",
           name: "Edit-Student",
           component: () => import("@/views/Admin/Students/Edit.vue"),
-          meta: { requiresAuth: true, requiresAdmin: true },
+          meta: adminMeta,
         },
         {
           path: "/students/add",
           name: "Add-Student",
           component: () => import("@/views/Admin/Students/Add.vue"),
-          meta: { requiresAuth: true, requiresAdmin: true },
+          meta: adminMeta,
         },        
       ],
     },
@@ -63,19 +76,13 @@ const router: Router = createRouter({
       path: "/sections",
       name: "Sections",
       component: () => import("@/views/Admin/SectionsView.vue"),
-      meta: { requiresAuth: true, requiresAdmin: true },
-    },
-    {
-      path: "/advisories",
-      name: "Advisories",
-      component: () => import("@/views/Teacher/AdvisoriesView.vue"),
-      meta: { requiresAuth: true, requiresTeacher: true },
+      meta: adminMeta,
     },
     {
       path: "/teachers",
       name: "Teachers",
       component: () => import("@/views/Admin/Teachers/TeachersView.vue"),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: adminMeta,
       redirect: { name: "Teachers-List" },
       children: [
         {
@@ -87,25 +94,25 @@ const router: Router = createRouter({
           path: "/teachers/list",
           name: "Teachers-List",
           component: () => import("@/views/Admin/Teachers/Table.vue"),
-          meta: { requiresAuth: true, requiresAdmin: true },
+          meta: adminMeta,
         },
         {
           path: "/teachers/add",
           name: "Add-Teacher",
           component: () => import("@/views/Admin/Teachers/Add.vue"),
-          meta: { requiresAuth: true, requiresAdmin: true },
+          meta: adminMeta,
         },
         {
           path: "/teachers/edit/:id",
           name: "Edit-Teacher",
           component: () => import("@/views/Admin/Teachers/Edit.vue"),
-          meta: { requiresAuth: true, requiresAdmin: true },
+          meta: adminMeta,
         },
         {
           path: "/teachers/assign/:id",
           name: "Assign-Teacher",
           component: () => import("@/views/Admin/Teachers/Assign.vue"),
-          meta: { requiresAuth: true, requiresAdmin: true },
+          meta: adminMeta,
         }
       ]
     },
@@ -113,8 +120,23 @@ const router: Router = createRouter({
       path: '/subjects',
       name: 'Subjects',
       component: () => import("@/views/Admin/SubjectsView.vue"),
-      meta: { requiresAuth: true, requiresAdmin: true },    
-    }
+      meta: adminMeta,    
+    },
+    {
+      path: "/advisories",
+      name: "Advisories",
+      component: () => import("@/views/Teacher/Advisories/AdvisoriesView.vue"),
+      meta: teacherMeta,
+      redirect: { name: "Advisories-Sections" },
+      children: [
+        {
+          path: "",
+          name: "Advisories-Sections",
+          component: () => import("@/views/Teacher/Advisories/Index.vue"),
+          meta: teacherMeta,
+        }
+      ]
+    },
   ],
   history: createWebHistory(),
 } as RouterOptions)
@@ -138,45 +160,52 @@ router.beforeEach(async (to, from, next) => {
   const currentUser = await getCurrentUser();
   const userStore = useUserStore();
 
+  // Load Firestore user into Pinia if not already set
   if (userStore.user === null && currentUser) {
     const q = query(collection(db, "users"), where("email", "==", currentUser.email));
     const snapshot = await getDocs(q);
 
     if (!snapshot.empty) {
       const userDoc = snapshot.docs[0].data();
-      userStore.setUser(userDoc as Teacher); // Save Firestore user data into Pinia
+      userStore.setUser(userDoc as Teacher); // or a broader User type
     } else {
       console.warn("No matching user document found in Firestore");
       userStore.setUser(null);
     }
   }
 
-  if (to.matched.some((record: any) => record.meta.requiresAuth)) {
+  const meta = to.meta as RouteMeta; // typed meta
+
+  // 🔑 Auth required
+  if (meta.requiresAuth) {
     if (!currentUser) {
       return next({ name: "Login" });
     }
 
-    // 🔑 check admin requirement
-    if (to.matched.some((record: any) => record.meta.requiresAdmin)) {
-      if (userStore.user?.role !== "admin") {
-        // redirect non-admins to a safe page
-        return next({ name: "Advisories" }); 
-      }
-    } else if (to.matched.some((record: any) => record.meta.requiresTeacher)) {
-      if (userStore.user?.role !== "teacher") {
-        // redirect non-teachers to a safe page
-        return next({ name: "Home" }); 
-      }
+    // 🔑 Verified required
+    if (meta.requiresVerified && !userStore.user?.verified) {
+      // return next({ name: "VerifyAccount" }); // or wherever you want to send them
     }
 
-    return next();
+    // 🔑 Role check
+    if (meta.roles && !meta.roles.includes(userStore.user?.role as Role)) {
+      // redirect to a safe default depending on role
+      if (userStore.user?.role === "teacher") {
+        return next({ name: "Advisories" });
+      } else {
+        return next({ name: "Home" });
+      }
+    }
   } else {
+    // If route does not require auth but user is logged in, redirect to home
     if (currentUser) {
       return next({ name: "Home" });
     }
-    return next();
   }
+
+  return next();
 });
+
 
 
 
