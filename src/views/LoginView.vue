@@ -5,11 +5,11 @@ import { reactive, ref } from 'vue';
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import { getDocs, query, where } from 'firebase/firestore';
 import { Teacher } from '@/interfaces';
-import { teachersRef } from '@/services/teacherService';
+import { getTeacherByEmail } from '@/services/teacherService';
 import { useSubjectStore } from '@/stores/subject';
 import { useSectionStore } from '@/stores/sections';
+import { useTeacherStore } from '@/stores/teacherSubjects';
 
 const auth = getAuth();
 
@@ -22,6 +22,8 @@ const userStore = useUserStore();
 const subjectsStore = useSubjectStore();
 
 const sectionsStore = useSectionStore();
+
+const teachersStore = useTeacherStore();
 
 const state = reactive({
   email: '',
@@ -49,15 +51,20 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
     );
 
     // 2. Query Firestore for the user document
-    const q = query(teachersRef, where("email", "==", user.email));
-    const snapshot = await getDocs(q);
+    const snapshot = await getTeacherByEmail(user?.email ?? "");
 
     if (!snapshot.empty) {
-      const userDoc = snapshot.docs[0].data();
+      const docSnap = snapshot.docs[0];
+      const userDoc = { id: docSnap.id, ...docSnap.data() };
+
       userStore.setUser(userDoc as Teacher); // Save Firestore user data into Pinia
+      console.log("User data loaded:", userDoc);
+      console.log("User Store:", userStore.user);
       if (userStore.user?.role === 'admin') {
         subjectsStore.start();
         sectionsStore.start();
+      } else if (userStore.user?.role === 'teacher') {
+        teachersStore.start(userStore.user?.id);
       }
     } else {
       console.warn("No matching user document found in Firestore");
@@ -72,6 +79,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
     });
 
     router.push("/");
+    isLoading.value = false;
   } catch (error: any) {
     console.error("Error logging in user:", error);
 
@@ -120,45 +128,33 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
 </script>
 
 <template>
-    <GuestLayout :progress="isLoading">
-        <UCard class="max-w-md w-full p-6" variant="subtle">
-            <template #header>
-                <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted">Login</h1>                
-            </template>
-            
-            <UForm :validate="validate" :state="state"  @submit="onSubmit">
-                <div class="flex flex-col gap-4 justify-center">
-                    <UFormField label="Email" class="w-full" size="xl">
-                        <UInput
-                          class="w-full"
-                          v-model="state.email"
-                          type="email"
-                          placeholder="Enter your email"
-                          required />
-                    </UFormField>
-                    <UFormField label="Password" class="w-full" size="xl">
-                        <UInput
-                          class="w-full"
-                          v-model="state.password"
-                          type="password"
-                          placeholder="Enter your password"
-                          required />
-                    </UFormField>
-                </div>
-                <UButton
-                  :disabled="isLoading"
-                  type="submit"
-                  label="Login"
-                  class="mt-4" 
-                  size="xl"/>
-            </UForm>
-            <template #footer>
-                <p class="text-center text-sm text-gray-500">
-                    Don't have an account? 
-                    <ULink to="/register" class="text-primary hover:underline">Register here</ULink>
-                </p>            
-            </template>
+  <GuestLayout :progress="isLoading">
+    <UCard class="max-w-2xs sm:max-w-xs md:max-w-md w-full p-4 md:p-6" variant="subtle">
+      <template #header>
+        <div class="w-full flex justify-center items-center">
+          <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted text-center">Login</h1>
+        </div>
+      </template>
 
-        </UCard>
-    </GuestLayout>
+      <UForm :validate="validate" :state="state" @submit="onSubmit">
+        <div class="flex flex-col gap-4 justify-center">
+          <UFormField label="Email" class="w-full" size="xl">
+            <UInput class="w-full" v-model="state.email" type="email" placeholder="Enter your email" required />
+          </UFormField>
+          <UFormField label="Password" class="w-full" size="xl">
+            <UInput class="w-full" v-model="state.password" type="password" placeholder="Enter your password"
+              required />
+          </UFormField>
+          <UButton :disabled="isLoading" type="submit" label="Login" class="mt-4 justify-center items-center" size="xl" />
+        </div>
+      </UForm>
+      <template #footer>
+        <p class="text-center text-sm text-gray-500">
+          Don't have an account?
+          <ULink to="/register" class="text-primary hover:underline">Register here</ULink>
+        </p>
+      </template>
+
+    </UCard>
+  </GuestLayout>
 </template>
