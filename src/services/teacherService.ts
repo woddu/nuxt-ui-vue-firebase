@@ -1,8 +1,13 @@
 import { db } from '@/firebase'
-import { collection, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
+import { collection, doc, setDoc, deleteDoc, updateDoc, getDocs, query, where } from 'firebase/firestore'
 import type { Teacher } from '@/interfaces'
 
 export const teachersRef = collection(db, "users");
+
+export async function getTeacherByEmail(email: string) {
+  const q = query(teachersRef, where("email", "==", email));
+  return await getDocs(q);
+}
 
 export async function addTeacher(teacher: Teacher) {
   const docRef = doc(teachersRef)
