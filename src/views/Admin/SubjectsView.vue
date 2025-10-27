@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, h, resolveComponent, computed } from 'vue';
 import { Subject } from '@/interfaces';
-import type { FormError, TableColumn } from '@nuxt/ui';
+import type { FormError, SelectMenuItem, TableColumn } from '@nuxt/ui';
 import { DocumentData } from 'firebase/firestore';
 import { addSubject, deleteSubject, updateSubject } from '@/services/subjectService';
 import { columnCapitalize } from '../util';
@@ -14,9 +14,9 @@ const subjectStore = useSubjectStore()
 
 const subjects = subjectStore.subjects()
 
-const pending = computed(() => subjects.pending.value);
+const pending = computed(() => subjects?.pending.value);
 
-const error = computed(() => subjects.error.value);
+const error = computed(() => subjects?.error.value);
 
 const showFormModal = ref(false);
 
@@ -35,8 +35,14 @@ const subject = reactive<Subject>({
     teacherIds: []
 });
 
-const toast = useToast();
+const tracks= ref<SelectMenuItem[]>([
+    { id: 'Core Subject (All Tracks)', label: 'Core Subject (All Tracks)' },
+    { id: 'Academic Track (except Immersion)', label: 'Academic Track (except Immersion)' },
+    { id: 'TVL/ Sports/ Arts and Design Track', label: 'TVL/ Sports/ Arts and Design Track' },
+    { id: 'Work Immersion/ Culminating Activity (for Academic Track)', label: 'Work Immersion/ Culminating Activity (for Academic Track)' }
+])
 
+const toast = useToast();
 
 const tableColumn: TableColumn<DocumentData>[] = [
     columnCapitalize('name'),
@@ -106,7 +112,7 @@ const addSubjectHandler = async () => {
         .then(() => {
             showFormModal.value = false;
             toast.add({ title: 'Success', description: `Subject: ${subject.name} added successfully.`, color: 'success' })
-            subjects.data.value = [...subjects.data.value]
+            subjects.data.value = [...subjects?.data.value]
             emptySubject()
         })
         .catch((error) => {
@@ -124,7 +130,7 @@ const editSubjectHandler = async () => {
     updateSubject(subject)
         .then(() => {
             toast.add({ title: 'Success', description: `Subject: ${subject.name} updated successfully.`, color: 'success' })
-            subjects.data.value = [...subjects.data.value]
+            subjects.data.value = [...subjects?.data.value]
             emptySubject()
         })
         .catch((error) => {
@@ -142,7 +148,7 @@ const deleteSubjectHandler = async () => {
     deleteSubject(subject.id)
         .then(() => {
             toast.add({ title: 'Success', description: `Subject: ${subject.name} deleted successfully.`, color: 'success' });
-            subjects.data.value = [...subjects.data.value]
+            subjects.data.value = [...subjects?.data.value]
             emptySubject();
         })
         .catch((error) => {
@@ -182,8 +188,7 @@ function emptySubject() {
                                     placeholder="Enter subject name" />
                             </UFormField>
                             <UFormField label="Track" class="w-full" size="xl">
-                                <UInput class="w-full" v-model="subject.track" type="text"
-                                    placeholder="Enter subject track" />
+                                <USelectMenu v-model="subject.track" value-key="id" :items="tracks" placeholder="Select a track" class="w-full"/>
                             </UFormField>
                         </div>
                         <div class="flex justify-end">
@@ -202,7 +207,7 @@ function emptySubject() {
             </UModal>
         </div>
         <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-11rem)]">
-            <UTable sticky ref="table" :data="subjects" :columns="tableColumn" :loading="pending" :error="error"
+            <UTable sticky ref="table" :data="subjects ?? []" :columns="tableColumn" :loading="pending" :error="error"
                 :global-filter="globalFilter" class="max-h-[calc(100vh-11rem)]"/>
             <UModal v-model:open="showWarningModal" title="Confirm Deletion">
                 <template #body>
