@@ -14,9 +14,9 @@ const sectionStore = useSectionStore();
 
 const sections = sectionStore.sections();
 
-const pending = computed(() => sections.pending.value);
+const pending = computed(() => sections?.pending.value);
 
-const error = computed(() => sections.error.value);
+const error = computed(() => sections?.error.value);
 
 const showFormModal = ref(false);
 
@@ -225,9 +225,9 @@ function emptySection() {
                   size="xl" />
             </UModal>
         </div>
-        <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-11rem)]">
-            <UTable sticky ref="table" :data="sections" :columns="tableColumn" :loading="pending" :error="error"
-                :global-filter="globalFilter" class="max-h-[calc(100vh-11rem)]"/>
+        <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-14rem)] md:max-h-[calc(100vh-12rem)]">
+            <UTable sticky ref="table" :data="sections ?? []" :columns="tableColumn" :loading="pending" :error="error"
+                :global-filter="globalFilter" class="max-h-[calc(100vh-14rem)] md:max-h-[calc(100vh-12rem)]"/>
             <UModal v-model:open="showWarningModal" title="Confirm Deletion">
                 <template #body>
                     <p>Are you sure you want to delete {{ section.name }}?</p>

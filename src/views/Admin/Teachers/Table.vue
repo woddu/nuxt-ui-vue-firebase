@@ -187,7 +187,7 @@ onMounted(() => {
                 size="xl" />
         </div>
     </div>
-    <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-11rem)]">
+    <div class="border border-muted relative z-1 rounded-md max-h-[calc(100vh-14rem)] md:max-h-[calc(100vh-12rem)]">
         <UTable
           sticky
           ref="table"
@@ -196,7 +196,7 @@ onMounted(() => {
           :loading="pending"
           :error="error"
           :global-filter="globalFilter" 
-          class="max-h-[calc(100vh-11rem)]"/>
+          class="max-h-[calc(100vh-14rem)] md:max-h-[calc(100vh-12rem)]"/>
         <UModal v-model:open="showWarningModal" title="Confirm Deletion">
             <template #body>
                 <p>Are you sure you want to delete {{ teacher.lastName }}?</p>

@@ -58,8 +58,6 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
       const userDoc = { id: docSnap.id, ...docSnap.data() };
 
       userStore.setUser(userDoc as Teacher); // Save Firestore user data into Pinia
-      console.log("User data loaded:", userDoc);
-      console.log("User Store:", userStore.user);
       if (userStore.user?.role === 'admin') {
         subjectsStore.start();
         sectionsStore.start();
@@ -67,7 +65,6 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
         teachersStore.start(userStore.user?.id);
       }
     } else {
-      console.warn("No matching user document found in Firestore");
       userStore.setUser(null);
     }
 
@@ -81,7 +78,6 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
     router.push("/");
     isLoading.value = false;
   } catch (error: any) {
-    console.error("Error logging in user:", error);
 
     switch (error.code) {
       case "auth/invalid-email":
