@@ -125,25 +125,65 @@ interface SectionSubjectRead {
 interface Score {
   id: string;
   studentId: string;
+  studentLastName: string;
+  studentFirstName: string;
+
+  subjectId: string;
+  subjectName: string;
+
+  sectionId: string;
+  sectionName: string;
+
   teacherSubjectId: string;
 
-  // Written Works
-  WW1_First?: number;
-  WW2_First?: number;
-  // ... up to WW10_First
+  WW1_First: number;
+  WW2_First: number;
+  WW3_First: number;
+  WW4_First: number;
+  WW5_First: number;
+  WW6_First: number;
+  WW7_First: number;
+  WW8_First: number;
+  WW9_First: number;
+  WW10_First: number;
+  
+  WW1_Second: number;
+  WW2_Second: number;
+  WW3_Second: number;
+  WW4_Second: number;
+  WW5_Second: number;
+  WW6_Second: number;
+  WW7_Second: number;
+  WW8_Second: number;
+  WW9_Second: number;
+  WW10_Second: number;
 
-  // Performance Tasks
-  PT1_First?: number;
-  PT2_First?: number;
-  // ... up to PT10_First
+  PT1_First: number;
+  PT2_First: number;
+  PT3_First: number;
+  PT4_First: number;
+  PT5_First: number;
+  PT6_First: number;
+  PT7_First: number;
+  PT8_First: number;
+  PT9_First: number;
+  PT10_First: number;
 
-  // Exams
-  Exam_First?: number;
-  Exam_Second?: number;
+  PT1_Second: number;
+  PT2_Second: number;
+  PT3_Second: number;
+  PT4_Second: number;
+  PT5_Second: number;
+  PT6_Second: number;
+  PT7_Second: number;
+  PT8_Second: number;
+  PT9_Second: number;
+  PT10_Second: number;
 
-  // Final Grades
-  FinalGrade_First?: number;
-  FinalGrade_Second?: number;
+  Exam_First: number;
+  Exam_Second: number;
+
+  
 }
 
 interface SelectOptions {
