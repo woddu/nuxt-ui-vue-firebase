@@ -31,7 +31,7 @@ const sectionStore = useSectionStore();
 const handleLogout = async () => {
   await signOut(auth)
     .then(() => {
-      userStore.user = null;
+      userStore.clearUser();
       subjectStore.stop();
       sectionStore.stop();
       router.push('/login');
@@ -56,7 +56,7 @@ const navItems = ref<AppNavigationMenuItem[]>([
   ]},
   { icon: 'i-lucide-layers', label: 'Sections', to: '/sections', role: 'admin' },
   { icon: 'i-lucide-book', label: 'Subjects', to: '/subjects', role: 'admin' },
-  { icon: 'i-lucide-book', label: 'Advisories', to: '/advisories', role: 'teacher' },
+  { icon: 'i-lucide-layers', label: 'Advisories', to: '/advisories', role: 'teacher' },
 ]);
 
 const filteredNavItems = computed<AppNavigationMenuItem[]>(() => {
@@ -116,9 +116,9 @@ const filteredNavItems = computed<AppNavigationMenuItem[]>(() => {
             <template #right>
               <div class="flex items-center gap-2">
                 <UIcon name="i-lucide-circle-user-round" class="size-6"/>
-                <h1 class="text-lg text-highlighted font-medium">
-                  {{ userStore.user?.username }}
-                </h1>
+                <UUser
+                  :name="userStore.user?.username"
+                  :description="userStore.user?.role" />
               </div>
             </template>
           </UDashboardNavbar>
