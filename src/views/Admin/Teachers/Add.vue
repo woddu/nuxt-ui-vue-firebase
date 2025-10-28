@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { SelectOptions, Teacher } from '@/interfaces';
-import { addTeacher } from '@/services/teacherService';
+import { addTeacher, getTeacherByEmail } from '@/services/teacherService';
 import { FormError } from '@nuxt/ui';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
   (e: 'loading', value: boolean): void
 }>()
+
+const auth = getAuth();
 
 const toast = useToast();
 
@@ -24,6 +27,8 @@ const teacher = reactive<Teacher>({
     role: ''
 })
 
+const password = ref('');
+
 const genderOptions = ref<SelectOptions[]>([
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
@@ -38,6 +43,7 @@ const validate = (state: Teacher): FormError[] => {
     if (!state.username) errors.push({ name: 'username', message: 'Username is required' });
     if (!state.verified) errors.push({ name: 'verified', message: 'Verified is required' });    
     if (!state.gender) errors.push({ name: 'gender', message: 'Gender is required' });
+    if (!password.value) errors.push({ name: 'password', message: 'Password is required' });
   return errors;
 }
 
@@ -52,10 +58,22 @@ async function addTeacherHandler() {
 
     isLoading.value = true;
 
+    const snapshot = await getTeacherByEmail(teacher.email)
+
+    if (!snapshot.empty) {
+        toast.add({ title: 'Error', description: 'Email already in use', color: 'error' });
+        isLoading.value = false;
+        return;
+    }
+
     addTeacher(teacher)
-        .then(() => {
+        .then(async () => {
             toast.add({ title: 'Success', description: `Teacher: ${teacher.lastName} added successfully.`, color: 'success' });
-            // Redirect or reset form as needed
+            const { user } = await createUserWithEmailAndPassword(auth, teacher.email, password.value)
+
+            if (!user) {
+                throw new Error('Failed to create user');
+            }
         })
         .catch((error) => {
             console.error("Error adding teacher: ", error);
@@ -88,6 +106,9 @@ onMounted(() => {
       </UFormField>
       <UFormField label="Username" class="w-full" size="xl">
         <UInput class="w-full" v-model="teacher.username" type="text" placeholder="Enter username" required />
+      </UFormField>
+      <UFormField label="Password" class="w-full" size="xl">
+        <UInput class="w-full" v-model="password" type="password" placeholder="Enter password" required />
       </UFormField>
     </div>
     <div class="w-full flex flex-col gap-2 lg:gap-4 lg:flex-row xl:gap-8">
