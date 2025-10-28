@@ -134,6 +134,12 @@ const router: Router = createRouter({
           name: "Advisories-Sections",
           component: () => import("@/views/Teacher/Advisories/Index.vue"),
           meta: teacherMeta,
+        },
+        {
+          path: "/advisories/:id/students",
+          name: "Advisories-Students",
+          component: () => import("@/views/Teacher/Advisories/Students.vue"),
+          meta: teacherMeta,
         }
       ]
     },
