@@ -143,6 +143,27 @@ const router: Router = createRouter({
         }
       ]
     },
+    {
+      path: "/mysubjects",
+      name: "Teacher-Subjects",
+      component: () => import("@/views/Teacher/TeacherSubjects/TeacherSubjectsView.vue"),
+      meta: teacherMeta,
+      redirect: { name: "Teacher-Subjects-List" },
+      children: [
+        {
+          path: "",
+          name: "Teacher-Subjects-List",
+          component: () => import("@/views/Teacher/TeacherSubjects/Index.vue"),
+          meta: teacherMeta,
+        },
+        {
+          path: "details/:id",
+          name: "Teacher-Subject-Details",
+          component: () => import("@/views/Teacher/TeacherSubjects/Details.vue"),
+          meta: teacherMeta,
+        }
+      ]
+    }
   ],
   history: createWebHistory(),
 } as RouterOptions)
