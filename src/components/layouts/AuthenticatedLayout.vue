@@ -57,6 +57,7 @@ const navItems = ref<AppNavigationMenuItem[]>([
   { icon: 'i-lucide-layers', label: 'Sections', to: '/sections', role: 'admin' },
   { icon: 'i-lucide-book', label: 'Subjects', to: '/subjects', role: 'admin' },
   { icon: 'i-lucide-layers', label: 'Advisories', to: '/advisories', role: 'teacher' },
+  { icon: 'i-lucide-book', label: 'Subjects', to: '/mysubjects', role: 'teacher' },
 ]);
 
 const filteredNavItems = computed<AppNavigationMenuItem[]>(() => {

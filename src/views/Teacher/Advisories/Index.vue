@@ -43,6 +43,7 @@ watch(isLoading, (newValue) => {
                 <ul>
                     <li>
                         <UButton
+                            class="cursor-pointer"
                             variant="ghost"
                             label="View Students" 
                             @click="() => {
@@ -51,13 +52,16 @@ watch(isLoading, (newValue) => {
                                     name: 'Advisories-Students',
                                     params: { id: item.id }
                                 });
-                            }" 
+                            }"
+                            size="xl"
                           />
                     </li>
                     <li>
                         <UButton
+                            class="cursor-pointer"
                             variant="ghost"
                             label="View SOG" 
+                            size="xl"
                           />
                             <!-- @click="router.push({
                                 name: 'Advisories-SOG',
