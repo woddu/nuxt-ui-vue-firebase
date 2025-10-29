@@ -1,15 +1,17 @@
 import { useSectionsByAdviser } from "@/composables/useSections";
 import { useSubjectsByTeacher } from "@/composables/useSubjects";
 import { useTeacherSubjects } from "@/composables/useTeacherSubjects";
-import { Section, Subject, TeacherSubject } from "@/interfaces";
+import { Section, SectionSubjectRead, Subject, TeacherSubject } from "@/interfaces";
 import { defineStore } from "pinia";
 import { _RefFirestore, VueFirestoreQueryData } from "vuefire";
 import { useUserStore } from "./user";
+import { useSectionsSubjectsByTeacher } from "@/composables/useSectionSubjects";
 
 export const useTeacherStore = defineStore('teacher', () => {
   let teacherSubjectsCollection: _RefFirestore<VueFirestoreQueryData<TeacherSubject>> | null = null;
   let subjectsCollection: _RefFirestore<VueFirestoreQueryData<Subject>> | null = null;
   let advisorySectionsCollection: _RefFirestore<VueFirestoreQueryData<Section>> | null = null;
+  let subjectSectionsCollection: _RefFirestore<VueFirestoreQueryData<SectionSubjectRead>> | null = null;
   let stopCollections: (() => void) | null = null;
 
   const userStore = useUserStore();
@@ -21,10 +23,12 @@ export const useTeacherStore = defineStore('teacher', () => {
       teacherSubjectsCollection = useTeacherSubjects(teacherId);
       subjectsCollection = useSubjectsByTeacher(teacherId);
       advisorySectionsCollection = useSectionsByAdviser(teacherId);
+      subjectSectionsCollection = useSectionsSubjectsByTeacher(teacherId);
       stopCollections = () => {
         teacherSubjectsCollection?.stop();
         subjectsCollection?.stop();
         advisorySectionsCollection?.stop();
+        subjectSectionsCollection?.stop();
       };
     } catch (error) {
       console.error("Error starting teacher store:", error);
@@ -59,18 +63,29 @@ export const useTeacherStore = defineStore('teacher', () => {
     }
   }
 
+  function subjectSections(){
+    if (subjectSectionsCollection) {
+      return subjectSectionsCollection;
+    } else {
+      start(userStore.user?.id ?? "");
+      return subjectSectionsCollection;
+    }
+  }
+
   function stop() {
     stopCollections?.();
     stopCollections = null;
     teacherSubjectsCollection = null;
     subjectsCollection = null;
     advisorySectionsCollection = null;
+    subjectSectionsCollection = null
   }
 
   return {
     teacherSubjects,
     subjects,
     advisorySections,
+    subjectSections,
     start,
     stop,
   };

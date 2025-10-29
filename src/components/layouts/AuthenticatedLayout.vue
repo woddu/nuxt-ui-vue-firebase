@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useSubjectStore } from '@/stores/subject';
 import { useSectionStore } from '@/stores/sections';
+import { useTeacherStore } from '@/stores/teacherSubjects';
 
 defineProps({
   progress: {
@@ -28,12 +29,15 @@ const subjectStore = useSubjectStore();
 
 const sectionStore = useSectionStore();
 
+const teacherStore = useTeacherStore(); 
+
 const handleLogout = async () => {
   await signOut(auth)
     .then(() => {
       userStore.clearUser();
       subjectStore.stop();
       sectionStore.stop();
+      teacherStore.stop();
       router.push('/login');
     })
     .catch((error) => {
