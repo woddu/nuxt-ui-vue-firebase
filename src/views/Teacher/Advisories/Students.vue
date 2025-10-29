@@ -4,12 +4,19 @@ import { useTeacherStore } from '@/stores/teacherSubjects';
 import { columnCapitalize } from '@/views/util';
 import { TableColumn } from '@nuxt/ui';
 import { DocumentData } from 'firebase/firestore';
-import { computed, ref } from 'vue';
+import { watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+
+const emit = defineEmits<{
+    (e: 'loading', value: boolean): void
+}>();
 
 const router = useRouter();
 
 const teacherStore = useTeacherStore();
+
+const isLoading = ref(false)
 
 const advisory = computed(() => 
     teacherStore.advisorySections()?.data.value.find(ad => 
@@ -29,6 +36,13 @@ const studentsColumn: TableColumn<DocumentData>[] = [
     columnCapitalize('firstName'),
 ]
 
+onMounted(() => {
+    emit('loading', false);
+});
+
+watch(isLoading, (newValue) => {
+    emit('loading', newValue);
+})
 
 </script>
 

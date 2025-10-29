@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-
-const isLoading = ref(false);
+const isLoading = ref(true);
 
 </script>
 

@@ -1,17 +1,32 @@
 <script setup lang="ts">
 import { useTeacherStore } from '@/stores/teacherSubjects';
-import { computed } from 'vue';
+import { onMounted, ref } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+
+const emit = defineEmits<{
+    (e: 'loading', value: boolean): void
+}>();
 
 const router = useRouter();
 
 const teacherStore = useTeacherStore();
+
+const isLoading = ref(false)
 
 const advisoriesItems = computed(() => teacherStore.advisorySections()?.data.value.map(advisory => ({
         id: advisory.id,
         label: advisory.name,
     })) ?? [{ id: 'empty', label: 'empty' }]
 );
+
+onMounted(() => {
+    emit('loading', false);
+});
+
+watch(isLoading, (newValue) => {
+    emit('loading', newValue);
+})
 
 </script>
 
@@ -30,10 +45,13 @@ const advisoriesItems = computed(() => teacherStore.advisorySections()?.data.val
                         <UButton
                             variant="ghost"
                             label="View Students" 
-                            @click="router.push({
-                                name: 'Advisories-Students',
-                                params: { id: item.id }
-                            });" 
+                            @click="() => {
+                                isLoading = true;
+                                router.push({
+                                    name: 'Advisories-Students',
+                                    params: { id: item.id }
+                                });
+                            }" 
                           />
                     </li>
                     <li>
