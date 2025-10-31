@@ -112,12 +112,10 @@ interface SectionSubject {
 }
 
 interface SectionSubjectWrite extends SectionSubject {
-  
   assignedAt: FieldValue; // for serverTimestamp()
 }
 
-interface SectionSubjectRead {
-  
+interface SectionSubjectRead extends SectionSubject {  
   assignedAt: Timestamp; // what Firestore actually stores
 }
 
