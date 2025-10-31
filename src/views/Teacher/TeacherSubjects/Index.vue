@@ -24,7 +24,7 @@ watch(isLoading, (value) => {
 
 <template>
     <div class="m-2 mb-2.5 flex"> 
-        <ul>
+        <ul class="border-s border-default ms-2.5 ps-2.5 md:ms-5 md:ps-5">
             <li v-for="subject in teacherStore.subjects()?.data.value" :key="subject.id">
                 <UButton
                     class="cursor-pointer"

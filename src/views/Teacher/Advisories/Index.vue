@@ -40,7 +40,7 @@ watch(isLoading, (newValue) => {
         }">
         <template #content="{ item }">
             <div class="m-2 mb-2.5 flex"> 
-                <ul>
+                <ul class="border-s border-default ms-2.5 ps-2.5 md:ms-5 md:ps-5">
                     <li>
                         <UButton
                             class="cursor-pointer"
