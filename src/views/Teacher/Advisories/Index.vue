@@ -35,9 +35,9 @@ watch(isLoading, (newValue) => {
     <UAccordion
       type="multiple"
       :items="advisoriesItems"
-      :ui="{
-        label: 'text-xl text-highlighted font-semibold'
-      }">
+        :ui="{
+            label: 'text-xl text-highlighted font-semibold'
+        }">
         <template #content="{ item }">
             <div class="m-2 mb-2.5 flex"> 
                 <ul>

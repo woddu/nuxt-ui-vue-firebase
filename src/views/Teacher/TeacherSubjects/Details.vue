@@ -32,6 +32,8 @@ const subjectSections = computed(() => {
     );
 })
 
+
+
 const teacherSubjectModel = reactive<TeacherSubject>({
     id: '',
     teacherSubjectId: '',
@@ -102,26 +104,256 @@ watch(isLoading, (newValue) => {
         <UAccordion 
             :items="[{label: '1st Quarter'}]"
             :ui="{
-                label: 'text-xl text-highlighted font-semibold'
+                label: 'text-2xl text-highlighted font-bold'
             }"
         >
             <template #content>
-                <UInput v-model="teacherSubjectModel.WW1_First" type="number" min="0" max="100" placeholder="Enter score" />
-                <UInput v-model="teacherSubjectModel.WW2_First" type="number" min="0" max="100" placeholder="Enter score" />
-                <UInput v-model="teacherSubjectModel.WW3_First" type="number" min="0" max="100" placeholder="Enter score" />
-                <UInput v-model="teacherSubjectModel.WW4_First" type="number" min="0" max="100" placeholder="Enter score" />
-                <UInput v-model="teacherSubjectModel.WW5_First" type="number" min="0" max="100" placeholder="Enter score" />
-
+                <UAccordion
+                    class="pl-5 mb-2" 
+                    :items="[{label: 'Written Works'}]"
+                    :ui="{
+                        label: 'text-xl text-highlighted font-semibold'
+                    }"
+                >
+                    <template #content>
+                        <div class="grid grid-cols-2 md:grid-cols-1! md:grid-rows-2 gap-4">
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">                            
+                                <UFormField label="#1">
+                                    <UInputNumber v-model="teacherSubjectModel.WW1_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#2">
+                                    <UInputNumber v-model="teacherSubjectModel.WW2_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#3">
+                                    <UInputNumber v-model="teacherSubjectModel.WW3_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#4">
+                                    <UInputNumber v-model="teacherSubjectModel.WW4_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#5">
+                                    <UInputNumber v-model="teacherSubjectModel.WW5_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                            </div>  
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">      
+                                <UFormField label="#6">
+                                    <UInputNumber v-model="teacherSubjectModel.WW6_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#7">
+                                    <UInputNumber v-model="teacherSubjectModel.WW7_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#8">
+                                    <UInputNumber v-model="teacherSubjectModel.WW8_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#9">
+                                    <UInputNumber v-model="teacherSubjectModel.WW9_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#10">
+                                    <UInputNumber v-model="teacherSubjectModel.WW10_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>                                
+                            </div>
+                        </div>                        
+                    </template>
+                </UAccordion>
+                <UAccordion 
+                    class="pl-5 mb-2" 
+                    :items="[{label: 'Performance Tasks'}]"
+                    :ui="{
+                        label: 'text-xl text-highlighted font-semibold'
+                    }"
+                >
+                    <template #content>
+                        <div class="grid grid-cols-2 md:grid-cols-1! md:grid-rows-2 gap-4">
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">                            
+                                <UFormField label="#1">
+                                    <UInputNumber v-model="teacherSubjectModel.PT1_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#2">
+                                    <UInputNumber v-model="teacherSubjectModel.PT2_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#3">
+                                    <UInputNumber v-model="teacherSubjectModel.PT3_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#4">
+                                    <UInputNumber v-model="teacherSubjectModel.PT4_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#5">
+                                    <UInputNumber v-model="teacherSubjectModel.PT5_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                            </div>  
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">      
+                                <UFormField label="#6">
+                                    <UInputNumber v-model="teacherSubjectModel.PT6_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#7">
+                                    <UInputNumber v-model="teacherSubjectModel.PT7_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#8">
+                                    <UInputNumber v-model="teacherSubjectModel.PT8_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#9">
+                                    <UInputNumber v-model="teacherSubjectModel.PT9_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#10">
+                                    <UInputNumber v-model="teacherSubjectModel.PT10_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>                                
+                            </div>
+                        </div>
+                    </template>
+                </UAccordion>
+                <UAccordion 
+                    class="pl-5 mb-2" 
+                    :items="[{label: 'Exam'}]"
+                    :ui="{
+                        label: 'text-xl text-highlighted font-semibold'
+                    }"
+                >
+                    <template #content>
+                        <UFormField label="Exam">
+                            <UInputNumber v-model="teacherSubjectModel.Exam_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                        </UFormField>
+                    </template>
+                </UAccordion>
             </template>
         </UAccordion>
         <UAccordion 
+            class="mb-4"
             :items="[{label: '2nd Quarter'}]"
             :ui="{
-                label: 'text-xl text-highlighted font-semibold'
+                label: 'text-2xl text-highlighted font-bold'
             }"
         >
             <template #content>
+                <UAccordion
+                    class="pl-5 mb-2" 
+                    :items="[{label: 'Written Works'}]"
+                    :ui="{
+                        label: 'text-xl text-highlighted font-semibold'
+                    }"
+                >
+                    <template #content>
+                        <div class="grid grid-cols-2 md:grid-cols-1! md:grid-rows-2 gap-4">
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">                            
+                                <UFormField label="#1">
+                                    <UInputNumber v-model="teacherSubjectModel.WW1_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#2">
+                                    <UInputNumber v-model="teacherSubjectModel.WW2_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#3">
+                                    <UInputNumber v-model="teacherSubjectModel.WW3_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#4">
+                                    <UInputNumber v-model="teacherSubjectModel.WW4_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#5">
+                                    <UInputNumber v-model="teacherSubjectModel.WW5_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                            </div>  
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">      
+                                <UFormField label="#6">
+                                    <UInputNumber v-model="teacherSubjectModel.WW6_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#7">
+                                    <UInputNumber v-model="teacherSubjectModel.WW7_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#8">
+                                    <UInputNumber v-model="teacherSubjectModel.WW8_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#9">
+                                    <UInputNumber v-model="teacherSubjectModel.WW9_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#10">
+                                    <UInputNumber v-model="teacherSubjectModel.WW10_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>                                
+                            </div>
+                        </div>                        
+                    </template>
+                </UAccordion>
+                <UAccordion 
+                    class="pl-5 mb-2" 
+                    :items="[{label: 'Performance Tasks'}]"
+                    :ui="{
+                        label: 'text-xl text-highlighted font-semibold'
+                    }"
+                >
+                    <template #content>
+                        <div class="grid grid-cols-2 md:grid-cols-1! md:grid-rows-2 gap-4">
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">                            
+                                <UFormField label="#1">
+                                    <UInputNumber v-model="teacherSubjectModel.PT1_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#2">
+                                    <UInputNumber v-model="teacherSubjectModel.PT2_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#3">
+                                    <UInputNumber v-model="teacherSubjectModel.PT3_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#4">
+                                    <UInputNumber v-model="teacherSubjectModel.PT4_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#5">
+                                    <UInputNumber v-model="teacherSubjectModel.PT5_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                            </div>  
+                            <div class="grid grid-rows-5 md:grid-rows-1! md:grid-cols-5 gap-4">      
+                                <UFormField label="#6">
+                                    <UInputNumber v-model="teacherSubjectModel.PT6_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#7">
+                                    <UInputNumber v-model="teacherSubjectModel.PT7_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#8">
+                                    <UInputNumber v-model="teacherSubjectModel.PT8_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#9">
+                                    <UInputNumber v-model="teacherSubjectModel.PT9_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>
+                                <UFormField label="#10">
+                                    <UInputNumber v-model="teacherSubjectModel.PT10_Second" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                                </UFormField>                                
+                            </div>
+                        </div>
+                    </template>
+                </UAccordion>
+                <UAccordion 
+                    class="pl-5 mb-2" 
+                    :items="[{label: 'Exam'}]"
+                    :ui="{
+                        label: 'text-xl text-highlighted font-semibold'
+                    }"
+                >
+                    <template #content>
+                        <UFormField label="Exam">
+                            <UInputNumber v-model="teacherSubjectModel.Exam_First" :min="0" :max="100" placeholder="Enter score" size="xl"/>
+                        </UFormField>
+                    </template>
+                </UAccordion>
+            </template>
+        </UAccordion>
 
+        <UAccordion 
+            class="mb-4"
+            :items="[{label: 'Sections'}]"
+            :ui="{
+                label: 'text-2xl text-highlighted font-semibold'
+            }" >
+            <template #content>
+                <ul>
+                    <li v-for="subjectSection in subjectSections" :key="subjectSection.id">
+                        <UButton
+                            class="cursor-pointer"
+                            variant="ghost"
+                            :label="subjectSection.sectionName" 
+                            @click="() => {
+                                isLoading = true;
+                                // router.push({
+                                //     name: 'Teacher-Subject-Details',
+                                //     params: { id: subjectSection.id }
+                                // });
+                            }"
+                            size="xl"/>
+                    </li>
+                </ul>
             </template>
         </UAccordion>
     </UForm>
