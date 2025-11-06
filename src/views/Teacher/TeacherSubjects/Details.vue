@@ -103,6 +103,7 @@ watch(isLoading, (newValue) => {
     <PageHeaderTitle :title="teacherSubjectName + ' Highest Possible Scores'" />
     <UForm>
         <UAccordion 
+            class="border-b border-default "
             :items="[{label: '1st Quarter'}]"
             :ui="{
                 label: 'text-2xl text-highlighted font-bold'
@@ -347,8 +348,8 @@ watch(isLoading, (newValue) => {
         </UAccordion>
 
         <UAccordion 
-            class="mb-4"
-            :items="[{label: 'Sections'}]"
+            class="mt-2 mb-4"
+            :items="[{label: teacherSubjectName + ' Sections'}]"
             :ui="{
                 label: 'text-2xl text-highlighted font-semibold'
             }" >
