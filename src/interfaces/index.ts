@@ -125,6 +125,7 @@ interface Score {
   studentId: string;
   studentLastName: string;
   studentFirstName: string;
+  studentGender: string;
 
   subjectId: string;
   subjectName: string;
