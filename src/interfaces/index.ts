@@ -50,6 +50,7 @@ interface Subject {
   id: string;
   name: string;
   track: string;
+  semester: string;
   teacherIds: string[]; // array of Teacher IDs
 }
 
@@ -135,6 +136,8 @@ interface Score {
 
   teacherSubjectId: string;
 
+  semester: string;
+
   WW1_First: number;
   WW2_First: number;
   WW3_First: number;
@@ -181,8 +184,9 @@ interface Score {
 
   Exam_First: number;
   Exam_Second: number;
-
   
+  Initial_Grade: number;
+  Final_Grade: number;
 }
 
 interface SelectOptions {
