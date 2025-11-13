@@ -189,6 +189,23 @@ interface Score {
   Final_Grade: number;
 }
 
+interface InitalScoreDetails{
+  studentId: string;
+  studentLastName: string;
+  studentFirstName: string;
+  studentGender: string;
+
+  subjectId: string;
+  subjectName: string;
+
+  sectionId: string;
+  sectionName: string;
+
+  teacherSubjectId: string;
+
+  semester: string;
+}
+
 interface SelectOptions {
   label: string;
   value: string;
@@ -207,5 +224,6 @@ export type {
   Score, 
   SelectOptions, 
   Role, 
-  StudentExtraField
+  StudentExtraField,
+  InitalScoreDetails
  };
