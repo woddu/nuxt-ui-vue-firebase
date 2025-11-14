@@ -161,7 +161,19 @@ const router: Router = createRouter({
           name: "Teacher-Subject-Details",
           component: () => import("@/views/Teacher/TeacherSubjects/Details.vue"),
           meta: teacherMeta,
-        }
+        },
+        {
+          path: "students/:id",
+          name: "Teacher-Subject-Students",
+          component: () => import("@/views/Teacher/TeacherSubjects/Students.vue"),
+          meta: teacherMeta,
+        },
+        {
+          path: "studentscore/:id",
+          name: "Teacher-Subject-Student-Score",
+          component: () => import("@/views/Teacher/TeacherSubjects/StudentScore.vue"),
+          meta: teacherMeta,
+        }        
       ]
     }
   ],
