@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
-const students = useStudentsBySection(router.currentRoute.value.params.sectionId as string)
+const students = useStudentsBySection(router.currentRoute.value.params.id as string)
 
 const pending = computed(() => students.pending ?? false);
 
@@ -36,8 +36,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
                 h(UButton, {
                     label: 'Grade',
                     variant: 'soft',
-                    color: 'error',
-                    class: 'rounded-full',
+                    class: 'rounded-full cursor-pointer',
                     size: 'xl',
                     onClick: () => {
                         
