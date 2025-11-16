@@ -164,7 +164,7 @@ const router: Router = createRouter({
         },
         {
           path: "students/:id",
-          name: "Teacher-Subject-Students",
+          name: "Teacher-Subject-Section-Students",
           component: () => import("@/views/Teacher/TeacherSubjects/Students.vue"),
           meta: teacherMeta,
         },
