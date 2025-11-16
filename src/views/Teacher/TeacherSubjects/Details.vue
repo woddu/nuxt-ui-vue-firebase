@@ -362,10 +362,11 @@ watch(isLoading, (newValue) => {
                             :label="subjectSection.sectionName" 
                             @click="() => {
                                 isLoading = true;
-                                // router.push({
-                                //     name: 'Teacher-Subject-Details',
-                                //     params: { id: subjectSection.id }
-                                // });
+                                console.log('Clicked section:', subjectSection.sectionId);
+                                router.push({
+                                    name: 'Teacher-Subject-Section-Students',
+                                    params: { id: subjectSection.sectionId }
+                                });
                             }"
                             size="xl"/>
                     </li>
