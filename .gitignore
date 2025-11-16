@@ -27,3 +27,8 @@ auto-imports.d.ts
 components.d.ts
 
 .env
+
+.firebaserc
+/firebase.json
+
+.firebase/
