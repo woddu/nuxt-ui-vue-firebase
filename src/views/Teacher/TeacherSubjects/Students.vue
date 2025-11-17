@@ -14,6 +14,8 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
+const isLoading = ref(false);
+
 const students = useStudentsBySection(router.currentRoute.value.params.id as string)
 
 const pending = computed(() => students.pending ?? false);
@@ -39,7 +41,20 @@ const tableColumn: TableColumn<DocumentData>[] = [
                     class: 'rounded-full cursor-pointer',
                     size: 'xl',
                     onClick: () => {
-                        
+                        isLoading.value = true;
+                        router.push({
+                            name: 'Teacher-Subject-Student-Score',
+                            params: {
+                                id: row.original.id
+                            },
+                            query: {
+                                sectionId: router.currentRoute.value.params.id as string,
+                                sectionName: router.currentRoute.value.query.name as string,
+                                subjectId: router.currentRoute.value.query.subjectId as string,
+                                subjectName: router.currentRoute.value.query.subjectName as string,
+                                teacherSubjectId: router.currentRoute.value.query.teacherSubjectId as string
+                            }
+                        })
                     }
                 })
             )
@@ -48,6 +63,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
 ]
 
 onMounted(() => {
+    isLoading.value = false;
     emit('loading', false);
 });
 
