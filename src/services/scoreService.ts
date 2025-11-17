@@ -16,7 +16,9 @@ export async function createScore(initalScoreDetails: InitalScoreDetails) {
 
 export async function updateScore(score: Score) {
     if (!score.id) {
-        throw new Error("Score ID is required for updating");
+      const scoreRef = doc(scoresRef);
+      await setDoc(scoreRef, { ...score, id: scoreRef.id });
+      return scoreRef.id;
     }
     const { id, ...data } = score;
     const docRef = doc(scoresRef, id);
