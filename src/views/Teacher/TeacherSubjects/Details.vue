@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { TeacherSubject } from '@/interfaces';
 import { useTeacherStore } from '@/stores/teacherSubjects';
+import { FormError } from '@nuxt/ui';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -31,8 +32,6 @@ const subjectSections = computed(() => {
         section.id === router.currentRoute.value.params.id
     );
 })
-
-
 
 const teacherSubjectModel = reactive<TeacherSubject>({
     id: '',
@@ -81,6 +80,15 @@ const teacherSubjectModel = reactive<TeacherSubject>({
     Exam_Second: 0
 });
 
+const validate = (state: TeacherSubject): FormError[] => {
+    const errors = [];
+
+    if(!state.teacherSubjectId){
+        errors.push({ name: 'teacherSubjectId', message: 'Teacher Subject ID is required' });
+    }
+
+    return errors;
+}
 
 onMounted(() => {    
     emit('loading', false);
@@ -101,7 +109,7 @@ watch(isLoading, (newValue) => {
 <template>
 
     <PageHeaderTitle :title="teacherSubjectName + ' Highest Possible Scores'" />
-    <UForm>
+    <UForm :validate="validate" :state="teacherSubjectModel" >
         <UAccordion 
             class="border-b border-default "
             :items="[{label: '1st Quarter'}]"
@@ -365,7 +373,15 @@ watch(isLoading, (newValue) => {
                                 console.log('Clicked section:', subjectSection.sectionId);
                                 router.push({
                                     name: 'Teacher-Subject-Section-Students',
-                                    params: { id: subjectSection.sectionId }
+                                    params: { 
+                                        id: subjectSection.sectionId
+                                    }, 
+                                    query: {
+                                        name: subjectSection.sectionName,
+                                        subjectId: router.currentRoute.value.params.id as string,
+                                        subjectName: teacherSubjectName,
+                                        teacherSubjectId: teacherSubject?.id
+                                    }
                                 });
                             }"
                             size="xl"/>
