@@ -34,7 +34,9 @@ watch(isLoading, (value) => {
                         isLoading = true;
                         router.push({
                             name: 'Teacher-Subject-Details',
-                            params: { id: subject.id }
+                            params: { 
+                                id: subject.id
+                            }
                         });
                     }"
                     size="xl"/>
