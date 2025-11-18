@@ -1,5 +1,6 @@
+import { TeacherSubject } from "@/interfaces";
 import { db } from '@/firebase'
-import { doc, runTransaction, arrayUnion, arrayRemove, collection } from 'firebase/firestore'
+import { doc, runTransaction, arrayUnion, arrayRemove, collection, updateDoc } from 'firebase/firestore'
 import { subjectsRef } from './subjectService';
 import { teachersRef } from './teacherService';
 
@@ -70,6 +71,21 @@ export async function addSubjectTeacher(subjectId: string, teacherId: string) {
     }    
     tx.set(teacherSubjectRefDoc, newTeacherSubject);
   });
+}
+
+export async function updateSubjectTeacher(teacherId: string, teacherSubject: TeacherSubject) {
+  if (!teacherSubject.id || !teacherId){
+
+    return;
+  }
+
+  const teacherRef = doc(teachersRef, teacherId);
+
+  const teacherSubjectRef = collection(teacherRef, 'subjects');
+
+  const { id, ...data } = teacherSubject;
+  const docRef = doc(teacherSubjectRef, id);
+  await updateDoc(docRef, data);
 }
 
 export async function removeSubjectTeacher(subjectId: string, teacherId: string) {
