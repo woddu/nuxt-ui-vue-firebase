@@ -126,6 +126,14 @@ const validate = (state: Section): FormError[] => {
 
 const addSectionHandler = async () => {
 
+    const errors = validate(section);
+    if(errors.length > 0){
+        for (const error of errors) {
+            toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
+        }
+        return;
+    }
+
     isLoading.value = true;
     addSection(section)
         .then(() => {

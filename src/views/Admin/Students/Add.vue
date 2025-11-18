@@ -54,6 +54,7 @@ const addStudentHandler = async () => {
     for (const error of errors) {
       toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
     }
+    return;
   }
 
   isLoading.value = true;
