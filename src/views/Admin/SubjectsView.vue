@@ -32,7 +32,8 @@ const subject = reactive<Subject>({
     id: '',
     name: '',
     track: '',
-    teacherIds: []
+    teacherIds: [],
+    semester: ''
 });
 
 const tracks= ref<SelectMenuItem[]>([
@@ -102,10 +103,22 @@ const validate = (state: Subject): FormError[] => {
         errors.push({ name: 'track', message: 'Track is required' });
         toast.add({ title: 'Validation Error', description: 'Track is required', color: 'error' });
     }
+    if (!state.semester) {
+        errors.push({ name: 'semester', message: 'Semester is required' });
+        toast.add({ title: 'Validation Error', description: 'Semester is required', color: 'error' });
+    }
     return errors;
 }
 
 const addSubjectHandler = async () => {
+
+    const errors = validate(subject);
+    if (errors.length > 0) {
+        for (const error of errors) {
+            toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
+        }
+        return;
+    }
 
     isLoading.value = true;
     addSubject(subject)
@@ -189,6 +202,9 @@ function emptySubject() {
                             </UFormField>
                             <UFormField label="Track" class="w-full" size="xl">
                                 <USelectMenu v-model="subject.track" value-key="id" :items="tracks" placeholder="Select a track" class="w-full"/>
+                            </UFormField>
+                            <UFormField label="Semester" class="w-full" size="xl">
+                                <USelectMenu v-model="subject.semester" value-key="id" :items="[ { id: '1st', label: '1st' }, { id: '2nd', label: '2nd' } ]" placeholder="Select a semester" class="w-full"/>
                             </UFormField>
                         </div>
                         <div class="flex justify-end">
