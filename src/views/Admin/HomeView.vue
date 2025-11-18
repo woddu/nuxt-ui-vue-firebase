@@ -2,11 +2,7 @@
 import AuthenticatedLayout from '@/components/layouts/AuthenticatedLayout.vue';
 import { getStudentCount } from '@/composables/useStudents';
 import { getTeachersCount } from '@/composables/useTeachers';
-import { db } from '@/firebase';
-import { Section, Student, Subject } from '@/interfaces';
-import { collection, doc, writeBatch } from 'firebase/firestore';
 import { onMounted, ref } from 'vue';
-
 
 const pending = ref(true);
 
