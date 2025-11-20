@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useScoresByStudent } from '@/composables/useScores';
+import { useStudentById } from '@/composables/useStudents';
 import { Score } from '@/interfaces';
+import { updateScore } from '@/services/scoreService';
+import { FormError } from '@nuxt/ui';
 import { ref } from 'vue';
 import { onMounted, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -9,9 +12,13 @@ const emit = defineEmits<{
     (e: 'loading', value: boolean): void
 }>()
 
+const toast = useToast();
+
 const router = useRouter();
 
 const isLoading = ref(false)
+
+const student = useStudentById(router.currentRoute.value.params.id as string)
 
 const studentScore = useScoresByStudent(router.currentRoute.value.params.id as string)
 
@@ -21,11 +28,11 @@ const studentScoreModel = reactive<Score>({
     studentLastName: '',
     studentFirstName: '',
     studentGender: '',
-    subjectId: '',
-    subjectName: '',
-    sectionId: '',
-    sectionName: '',
-    teacherSubjectId: '',
+    subjectId: router.currentRoute.value.query.subjectId as string,
+    subjectName: router.currentRoute.value.query.subjectName as string,
+    sectionId: router.currentRoute.value.query.sectionId as string,
+    sectionName: router.currentRoute.value.query.sectionName as string,
+    teacherSubjectId: router.currentRoute.value.query.teacherSubjectId as string,
     semester: '',
     WW1_First: 0,
     WW2_First: 0,
@@ -73,15 +80,56 @@ const studentScoreModel = reactive<Score>({
     Final_Grade: 0
 });
 
+const validate = (state: Score): FormError[] => {
+    const errors = [];
+
+    if(!state.studentId || !state.studentLastName || !state.studentFirstName || !state.studentGender){
+        errors.push({ title: 'student', message: 'Student info is incomplete.' });
+    }
+
+    return errors
+}
+
+async function saveStudentScore(){
+    isLoading.value = true;
+
+    const errors = validate(studentScoreModel);
+    if(errors.length > 0){
+        for (const error of errors) {
+            toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
+        }
+        return; 
+    }
+
+    updateScore(studentScoreModel)
+        .then(() => {
+            toast.add({ title: 'Success', description: 'Student score updated successfully.', color: 'success' });
+        })
+        .catch(() => {
+            toast.add({ title: 'Error', description: 'Failed to update student score.', color: 'error' });
+        })
+        .finally(() => {
+            isLoading.value = false;
+        });
+}
+
 onMounted(() => {    
     emit('loading', false);
 })
 
-watch(studentScore, (newValue) => {
-    if (newValue) {
-        Object.assign(studentScoreModel, newValue);
-    }
-})
+watch([student, studentScore], ([newStudent, newScore]) => {
+  if (newStudent) {
+    studentScoreModel.studentId = newStudent.id;
+    studentScoreModel.studentLastName = newStudent.lastName;
+    studentScoreModel.studentFirstName = newStudent.firstName;
+    studentScoreModel.studentGender = newStudent.gender;
+  }
+
+  if (newScore && studentScoreModel.studentId !== '') {
+    Object.assign(studentScoreModel, newScore);
+  }
+});
+
 
 watch(isLoading, (newValue) => {
     emit('loading', newValue);
@@ -90,7 +138,8 @@ watch(isLoading, (newValue) => {
 </script>
 
 <template>
-    <UForm>
+    <PageHeaderTitle :title="studentScoreModel.studentLastName + ', ' + studentScoreModel.studentFirstName + ' Scores'" />
+    <UForm :validate="validate" :state="studentScoreModel" @submit="saveStudentScore">
         <UAccordion 
             class="border-b border-default "
             :items="[{label: '1st Quarter'}]"
@@ -335,5 +384,6 @@ watch(isLoading, (newValue) => {
                 </div>  
             </template>
         </UAccordion>
+        <UButton :loading="isLoading"  :disabled="isLoading" type="submit" label="Save" class="mt-6" size="xl"/>
     </UForm>    
 </template>
