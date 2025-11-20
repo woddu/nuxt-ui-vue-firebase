@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { TeacherSubject } from '@/interfaces';
+import { updateSubjectTeacher } from '@/services/subjectTeacherService';
 import { useTeacherStore } from '@/stores/teacherSubjects';
+import { useUserStore } from '@/stores/user';
 import { FormError } from '@nuxt/ui';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -10,6 +12,10 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter();
+
+const toast = useToast();
+
+const userStore = useUserStore();
 
 const teacherStore = useTeacherStore();
 
@@ -90,6 +96,28 @@ const validate = (state: TeacherSubject): FormError[] => {
     return errors;
 }
 
+async function saveTeacherSubject() {
+    isLoading.value = true;
+    const errors = validate(teacherSubjectModel);
+    if(errors.length > 0){
+        for (const error of errors) {
+            toast.add({ title: 'Validation Error', description: error.message, color: 'error' });
+        }
+        return; 
+    }
+
+    updateSubjectTeacher(userStore.user?.id ?? "", teacherSubjectModel)
+        .then(() => {
+            toast.add({ title: 'Success', description: 'Subject detail updated successfully', color: 'success' });
+        })
+        .catch(() => {
+            toast.add({ title: 'Error', description: 'Failed to update subject detail', color: 'error' });
+        })
+        .finally(() => {
+            isLoading.value = false;
+        });
+}
+
 onMounted(() => {    
     emit('loading', false);
 })
@@ -109,7 +137,7 @@ watch(isLoading, (newValue) => {
 <template>
 
     <PageHeaderTitle :title="teacherSubjectName + ' Highest Possible Scores'" />
-    <UForm :validate="validate" :state="teacherSubjectModel" >
+    <UForm :validate="validate" :state="teacherSubjectModel" @submit="saveTeacherSubject">
         <UAccordion 
             class="border-b border-default "
             :items="[{label: '1st Quarter'}]"
@@ -354,40 +382,41 @@ watch(isLoading, (newValue) => {
                 </div>  
             </template>
         </UAccordion>
-
-        <UAccordion 
-            class="mt-2 mb-4"
-            :items="[{label: teacherSubjectName + ' Sections'}]"
-            :ui="{
-                label: 'text-2xl text-highlighted font-semibold'
-            }" >
-            <template #body>
-                <ul class="border-s border-default ms-2.5 ps-2.5 md:ms-5 md:ps-5">
-                    <li v-for="subjectSection in subjectSections" :key="subjectSection.id">
-                        <UButton
-                            class="cursor-pointer"
-                            variant="ghost"
-                            :label="subjectSection.sectionName" 
-                            @click="() => {
-                                isLoading = true;
-                                console.log('Clicked section:', subjectSection.sectionId);
-                                router.push({
-                                    name: 'Teacher-Subject-Section-Students',
-                                    params: { 
-                                        id: subjectSection.sectionId
-                                    }, 
-                                    query: {
-                                        name: subjectSection.sectionName,
-                                        subjectId: router.currentRoute.value.params.id as string,
-                                        subjectName: teacherSubjectName,
-                                        teacherSubjectId: teacherSubject?.id
-                                    }
-                                });
-                            }"
-                            size="xl"/>
-                    </li>
-                </ul>
-            </template>
-        </UAccordion>
+        <UButton :loading="isLoading"  :disabled="isLoading" type="submit" label="Save" class="mt-6" size="xl"/>
     </UForm>
+
+    <UAccordion 
+        class="mt-2 mb-4"
+        :items="[{label: teacherSubjectName + ' Sections'}]"
+        :ui="{
+            label: 'text-2xl text-highlighted font-semibold'
+        }" >
+        <template #body>
+            <ul class="border-s border-default ms-2.5 ps-2.5 md:ms-5 md:ps-5">
+                <li v-for="subjectSection in subjectSections" :key="subjectSection.id">
+                    <UButton
+                        class="cursor-pointer"
+                        variant="ghost"
+                        :label="subjectSection.sectionName" 
+                        @click="() => {
+                            isLoading = true;
+                            console.log('Clicked section:', subjectSection.sectionId);
+                            router.push({
+                                name: 'Teacher-Subject-Section-Students',
+                                params: { 
+                                    id: subjectSection.sectionId
+                                }, 
+                                query: {
+                                    name: subjectSection.sectionName,
+                                    subjectId: router.currentRoute.value.params.id as string,
+                                    subjectName: teacherSubjectName,
+                                    teacherSubjectId: teacherSubject?.id
+                                }
+                            });
+                        }"
+                        size="xl"/>
+                </li>
+            </ul>
+        </template>
+    </UAccordion>
 </template>
