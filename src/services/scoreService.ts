@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import { collection, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
+import { collection, doc, setDoc, updateDoc } from 'firebase/firestore'
 import type { InitalScoreDetails, Score } from '@/interfaces'
 
 export const scoresRef = collection(db, "scores");

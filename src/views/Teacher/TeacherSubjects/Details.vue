@@ -136,7 +136,7 @@ watch(isLoading, (newValue) => {
 
 <template>
 
-    <PageHeaderTitle :title="teacherSubjectName + ' Highest Possible Scores'" />
+    <PageHeaderTitle :title="teacherSubjectName + ' - Highest Possible Scores'" />
     <UForm :validate="validate" :state="teacherSubjectModel" @submit="saveTeacherSubject">
         <UAccordion 
             class="border-b border-default "
