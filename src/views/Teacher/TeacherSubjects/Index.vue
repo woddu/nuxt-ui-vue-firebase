@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTeacherStore } from '@/stores/teacherSubjects';
-import { onMounted, ref, watch } from 'vue';
+import { useUserStore } from '@/stores/user';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const emit = defineEmits<{
@@ -9,7 +10,11 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
+const userStore = useUserStore();
+
 const teacherStore = useTeacherStore();
+
+const subjects = computed(() => teacherStore.subjects()?.value.filter(subject => subject.teacherIds.includes(userStore.user?.id ?? '')) ?? []);
 
 const isLoading = ref(false);
 onMounted(() => {
@@ -25,7 +30,7 @@ watch(isLoading, (value) => {
 <template>
     <div class="m-2 mb-2.5 flex"> 
         <ul class="border-s border-default ms-2.5 ps-2.5 md:ms-5 md:ps-5">
-            <li v-for="subject in teacherStore.subjects()?.data.value" :key="subject.id">
+            <li v-for="subject in subjects" :key="subject.id">
                 <UButton
                     class="cursor-pointer"
                     variant="ghost"
