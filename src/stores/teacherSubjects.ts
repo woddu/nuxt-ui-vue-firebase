@@ -1,5 +1,5 @@
 import { useSectionsByAdviser } from "@/composables/useSections";
-import { useSubjectsByTeacher } from "@/composables/useSubjects";
+import { useSubjects } from "@/composables/useSubjects";
 import { useTeacherSubjects } from "@/composables/useTeacherSubjects";
 import { Section, SectionSubjectRead, Subject, TeacherSubject } from "@/interfaces";
 import { defineStore } from "pinia";
@@ -21,7 +21,7 @@ export const useTeacherStore = defineStore('teacher', () => {
     stop(); // reset previous listeners if switching teacher
     try{
       teacherSubjectsCollection = useTeacherSubjects(teacherId);
-      subjectsCollection = useSubjectsByTeacher(teacherId);
+      subjectsCollection = useSubjects();
       advisorySectionsCollection = useSectionsByAdviser(teacherId);
       subjectSectionsCollection = useSectionsSubjectsByTeacher(teacherId);
       stopCollections = () => {
