@@ -62,11 +62,11 @@ watch(isLoading, (newValue) => {
                             variant="ghost"
                             label="View SOG" 
                             size="xl"
-                          />
-                            <!-- @click="router.push({
+                            @click="router.push({
                                 name: 'Advisories-SOG',
                                 params: { id: item.id }
-                            });" -->
+                            });"
+                          />
                     </li>
                 </ul>               
             </div>

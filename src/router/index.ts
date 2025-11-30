@@ -140,6 +140,12 @@ const router: Router = createRouter({
           name: "Advisories-Students",
           component: () => import("@/views/Teacher/Advisories/Students.vue"),
           meta: teacherMeta,
+        },
+        {
+          path: "/advisories/:id/sog",
+          name: "Advisories-SOG",
+          component: () => import("@/views/Teacher/Advisories/SOG.vue"),
+          meta: teacherMeta,
         }
       ]
     },
