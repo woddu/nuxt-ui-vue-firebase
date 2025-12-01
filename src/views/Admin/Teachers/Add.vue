@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { SelectOptions, Teacher } from '@/interfaces';
+import router from '@/router';
 import { addTeacher, getTeacherByEmail } from '@/services/teacherService';
 import { FormError } from '@nuxt/ui';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
@@ -82,6 +83,8 @@ async function addTeacherHandler() {
         .finally(() => {
             isLoading.value = false;
         });
+        
+  router.push({ name: 'Teachers-List' });
 }
 
 watch(isLoading, (newVal) => {

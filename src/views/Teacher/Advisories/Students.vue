@@ -14,9 +14,9 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
-const teacherStore = useTeacherStore();
-
 const isLoading = ref(false)
+
+const teacherStore = useTeacherStore();
 
 const advisory = computed(() => 
     teacherStore.advisorySections()?.data.value.find(ad => 
