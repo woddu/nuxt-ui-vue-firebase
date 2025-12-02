@@ -41,6 +41,9 @@ watch(isLoading, (value) => {
                             name: 'Teacher-Subject-Details',
                             params: { 
                                 id: subject.id
+                            },
+                            query: {
+                                track: subject.track
                             }
                         });
                     }"

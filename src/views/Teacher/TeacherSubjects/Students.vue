@@ -52,6 +52,7 @@ const tableColumn: TableColumn<DocumentData>[] = [
                                 sectionName: router.currentRoute.value.query.name as string,
                                 subjectId: router.currentRoute.value.query.subjectId as string,
                                 subjectName: router.currentRoute.value.query.subjectName as string,
+                                subjectTrack: router.currentRoute.value.query.track as string,
                                 teacherSubjectId: router.currentRoute.value.query.teacherSubjectId as string
                             }
                         })

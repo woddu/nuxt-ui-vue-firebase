@@ -39,6 +39,7 @@ const studentScoreModel = reactive<Score>({
     studentGender: '',
     subjectId: router.currentRoute.value.query.subjectId as string,
     subjectName: router.currentRoute.value.query.subjectName as string,
+    subjectTrack: router.currentRoute.value.query.track as string,
     sectionId: router.currentRoute.value.query.sectionId as string,
     sectionName: router.currentRoute.value.query.sectionName as string,
     teacherSubjectId: router.currentRoute.value.query.teacherSubjectId as string,

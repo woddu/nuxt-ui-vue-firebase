@@ -410,6 +410,7 @@ watch(isLoading, (newValue) => {
                                     name: subjectSection.sectionName,
                                     subjectId: router.currentRoute.value.params.id as string,
                                     subjectName: teacherSubjectName,
+                                    subjectTrack: router.currentRoute.value.query.track as string,
                                     teacherSubjectId: teacherSubject?.id
                                 }
                             });
