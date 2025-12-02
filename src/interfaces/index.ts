@@ -130,6 +130,7 @@ interface Score {
 
   subjectId: string;
   subjectName: string;
+  subjectTrack: string;
 
   sectionId: string;
   sectionName: string;
